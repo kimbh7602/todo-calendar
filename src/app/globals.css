@@ -1,26 +1,44 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+  /* Surfaces */
+  --color-bg-primary: #0A0A0C;
+  --color-bg-secondary: #141418;
+  --color-bg-elevated: #1C1C22;
+  --color-border-subtle: #2A2A32;
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  /* Text */
+  --color-text-primary: #F0F0F2;
+  --color-text-secondary: #8888A0;
+  --color-text-tertiary: #55556A;
+
+  /* Categories */
+  --color-cat-coral: #FF6B6B;
+  --color-cat-amber: #FFBE5C;
+  --color-cat-lime: #A8E06C;
+  --color-cat-cyan: #5CC8FF;
+  --color-cat-violet: #B18CFF;
+  --color-cat-pink: #FF7EB3;
+  --color-cat-mint: #6CDFCF;
+
+  /* Radius */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-full: 9999px;
+
+  /* Font */
+  --font-sans: "Pretendard Variable", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+  --font-mono: "Geist Mono", monospace;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--color-bg-primary);
+  color: var(--color-text-primary);
+  font-family: var(--font-sans);
+}
+
+@keyframes breathe {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 0.6; }
 }
