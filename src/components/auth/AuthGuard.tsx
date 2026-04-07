@@ -25,9 +25,24 @@ export function AuthGuard({ children }: AuthGuardProps) {
     // Listen for auth changes
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null);
+    } = supabase.auth.onAuthStateChange(async (_event, session) => {
+      const currentUser = session?.user ?? null;
+      setUser(currentUser);
       setLoading(false);
+
+      // Ensure profile exists on login/signup
+      if (currentUser) {
+        await supabase.from("profiles").upsert(
+          {
+            id: currentUser.id,
+            display_name:
+              currentUser.user_metadata?.display_name ||
+              currentUser.email?.split("@")[0] ||
+              "사용자",
+          },
+          { onConflict: "id" }
+        );
+      }
     });
 
     return () => subscription.unsubscribe();
