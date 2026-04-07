@@ -15,6 +15,11 @@ export default function RootLayout({
     <html lang="ko" className="h-full antialiased">
       <head>
         <link
+          rel="preconnect"
+          href="https://cdn.jsdelivr.net"
+          crossOrigin="anonymous"
+        />
+        <link
           rel="stylesheet"
           as="style"
           crossOrigin="anonymous"

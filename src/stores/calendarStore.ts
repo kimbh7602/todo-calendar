@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import type { Todo, Completion, Category } from "@/types";
-import { DEFAULT_CATEGORIES } from "@/types";
+import { api } from "@/lib/api";
 
 interface CalendarState {
   // UI state (persisted)
@@ -9,21 +9,24 @@ interface CalendarState {
   currentMonth: number; // 0-indexed
   selectedDate: string | null; // YYYY-MM-DD or null (calendar view)
 
-  // Data (not persisted, fetched from DB later)
+  // Data (from Supabase, not persisted locally)
   categories: Category[];
   todos: Todo[];
   completions: Completion[];
+
+  // Loading state
+  isLoading: boolean;
 
   // Actions
   setMonth: (year: number, month: number) => void;
   nextMonth: () => void;
   prevMonth: () => void;
   selectDate: (date: string | null) => void;
-  addTodo: (todo: Todo) => void;
-  updateTodo: (id: string, updates: Partial<Todo>) => void;
-  deleteTodo: (id: string) => void;
-  toggleCompletion: (todoId: string, date: string) => void;
-  addCategory: (category: Category) => void;
+  addTodo: (todo: Omit<Todo, "id">) => Promise<void>;
+  updateTodo: (id: string, updates: Partial<Todo>) => Promise<void>;
+  deleteTodo: (id: string) => Promise<void>;
+  toggleCompletion: (todoId: string, date: string) => Promise<void>;
+  addCategory: (category: Omit<Category, "id">) => Promise<void>;
   isCompleted: (todoId: string, date: string) => boolean;
   getTodosForDate: (date: string) => Todo[];
   getCompletionRate: (date: string) => number;
@@ -38,12 +41,10 @@ export const useCalendarStore = create<CalendarState>()(
       currentMonth: now.getMonth(),
       selectedDate: null,
 
-      categories: DEFAULT_CATEGORIES.map((c, i) => ({
-        ...c,
-        id: `default-${i}`,
-      })),
+      categories: [],
       todos: [],
       completions: [],
+      isLoading: false,
 
       setMonth: (year, month) => set({ currentYear: year, currentMonth: month }),
 
@@ -68,46 +69,87 @@ export const useCalendarStore = create<CalendarState>()(
       selectDate: (date) => {
         const prev = get().selectedDate;
         if (date && !prev) {
-          // Push history entry when entering todo view
           window.history.pushState({ selectedDate: date }, "");
         }
         set({ selectedDate: date });
       },
 
-      addTodo: (todo) => set((s) => ({ todos: [...s.todos, todo] })),
+      addTodo: async (todoData) => {
+        set({ isLoading: true });
+        try {
+          const todo = await api.createTodo(todoData);
+          set((s) => ({ todos: [...s.todos, todo], isLoading: false }));
+        } catch {
+          set({ isLoading: false });
+        }
+      },
 
-      updateTodo: (id, updates) =>
-        set((s) => ({
-          todos: s.todos.map((t) => (t.id === id ? { ...t, ...updates } : t)),
-        })),
+      updateTodo: async (id, updates) => {
+        set({ isLoading: true });
+        try {
+          const updated = await api.updateTodo(id, updates);
+          set((s) => ({
+            todos: s.todos.map((t) => (t.id === id ? updated : t)),
+            isLoading: false,
+          }));
+        } catch {
+          set({ isLoading: false });
+        }
+      },
 
-      deleteTodo: (id) =>
-        set((s) => ({
-          todos: s.todos.filter((t) => t.id !== id),
-          completions: s.completions.filter((c) => c.todoId !== id),
-        })),
+      deleteTodo: async (id) => {
+        set({ isLoading: true });
+        try {
+          await api.deleteTodo(id);
+          set((s) => ({
+            todos: s.todos.filter((t) => t.id !== id),
+            completions: s.completions.filter((c) => c.todoId !== id),
+            isLoading: false,
+          }));
+        } catch {
+          set({ isLoading: false });
+        }
+      },
 
-      toggleCompletion: (todoId, date) =>
-        set((s) => {
-          const existing = s.completions.find(
-            (c) => c.todoId === todoId && c.completedDate === date
-          );
-          if (existing) {
-            return {
-              completions: s.completions.filter((c) => c.id !== existing.id),
-            };
-          }
-          return {
+      toggleCompletion: async (todoId, date) => {
+        const existing = get().completions.find(
+          (c) => c.todoId === todoId && c.completedDate === date
+        );
+
+        // Optimistic update for responsiveness
+        if (existing) {
+          set((s) => ({
+            completions: s.completions.filter((c) => c.id !== existing.id),
+          }));
+        } else {
+          set((s) => ({
             completions: [
               ...s.completions,
-              {
-                id: crypto.randomUUID(),
-                todoId,
-                completedDate: date,
-              },
+              { id: crypto.randomUUID(), todoId, completedDate: date },
             ],
-          };
-        }),
+          }));
+        }
+
+        try {
+          await api.toggleCompletion(todoId, date);
+          // Refresh completions from server to get real IDs
+          const completions = await api.fetchCompletions();
+          set({ completions });
+        } catch {
+          // Revert optimistic update
+          const completions = await api.fetchCompletions().catch(() => get().completions);
+          set({ completions });
+        }
+      },
+
+      addCategory: async (categoryData) => {
+        try {
+          const category = await api.createCategory(categoryData);
+          set((s) => ({ categories: [...s.categories, category] }));
+        } catch {
+          // silently fail
+        }
+      },
 
       isCompleted: (todoId, date) =>
         get().completions.some(
@@ -138,23 +180,16 @@ export const useCalendarStore = create<CalendarState>()(
 
       getCompletionRate: (date) => {
         const todos = get().getTodosForDate(date);
-        if (todos.length === 0) return -1; // no todos
+        if (todos.length === 0) return -1;
         const completed = todos.filter((t) => get().isCompleted(t.id, date));
         return completed.length / todos.length;
       },
-
-      addCategory: (category) =>
-        set((s) => ({ categories: [...s.categories, category] })),
     }),
     {
       name: "living-calendar",
       partialize: (state) => ({
         currentYear: state.currentYear,
         currentMonth: state.currentMonth,
-        // Also persist local data until Supabase is connected
-        categories: state.categories,
-        todos: state.todos,
-        completions: state.completions,
       }),
       skipHydration: true,
     }

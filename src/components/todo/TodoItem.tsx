@@ -30,7 +30,7 @@ export function TodoItem({
 
   const handleToggle = async () => {
     const wasCompleted = isCompleted(todo.id, date);
-    toggleCompletion(todo.id, date);
+    await toggleCompletion(todo.id, date);
 
     if (!wasCompleted && checkboxRef.current) {
       // Play sound

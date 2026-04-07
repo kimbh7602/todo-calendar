@@ -8,8 +8,11 @@ import { parseDate, getWeekdayLabel } from "@/lib/date";
 import { springs } from "@/lib/springs";
 
 export function TodoList() {
-  const { selectedDate, selectDate, getTodosForDate, categories } =
-    useCalendarStore();
+  const selectedDate = useCalendarStore((s) => s.selectedDate);
+  const selectDate = useCalendarStore((s) => s.selectDate);
+  const getTodosForDate = useCalendarStore((s) => s.getTodosForDate);
+  const categories = useCalendarStore((s) => s.categories);
+  const isCompleted = useCalendarStore((s) => s.isCompleted);
 
   if (!selectedDate) return null;
 
@@ -19,10 +22,10 @@ export function TodoList() {
   const weekday = getWeekdayLabel(date.getDay()) + "요일";
 
   const incompleteTodos = todos.filter(
-    (t) => !useCalendarStore.getState().isCompleted(t.id, selectedDate)
+    (t) => !isCompleted(t.id, selectedDate)
   );
   const completedTodos = todos.filter((t) =>
-    useCalendarStore.getState().isCompleted(t.id, selectedDate)
+    isCompleted(t.id, selectedDate)
   );
 
   return (
