@@ -1,5 +1,6 @@
 "use client";
 
+import { useMemo } from "react";
 import { motion } from "framer-motion";
 import { useCalendarStore } from "@/stores/calendarStore";
 import { TodoItem } from "./TodoItem";
@@ -10,23 +11,40 @@ import { springs } from "@/lib/springs";
 export function TodoList() {
   const selectedDate = useCalendarStore((s) => s.selectedDate);
   const selectDate = useCalendarStore((s) => s.selectDate);
-  const getTodosForDate = useCalendarStore((s) => s.getTodosForDate);
+  const todos = useCalendarStore((s) => s.todos);
+  const completions = useCalendarStore((s) => s.completions);
   const categories = useCalendarStore((s) => s.categories);
-  const isCompleted = useCalendarStore((s) => s.isCompleted);
 
   if (!selectedDate) return null;
 
   const date = parseDate(selectedDate);
-  const todos = getTodosForDate(selectedDate);
   const dayLabel = `${date.getMonth() + 1}월 ${date.getDate()}일`;
   const weekday = getWeekdayLabel(date.getDay()) + "요일";
 
-  const incompleteTodos = todos.filter(
-    (t) => !isCompleted(t.id, selectedDate)
+  // Filter todos for this date (reactive — re-runs when todos changes)
+  const dow = date.getDay();
+  const dateTodos = useMemo(() => {
+    return todos.filter((todo) => {
+      if (todo.isRoutine && todo.routineDays) {
+        if (!todo.routineDays.includes(dow)) return false;
+        if (selectedDate < todo.startDate) return false;
+        if (todo.routineEndDate && selectedDate > todo.routineEndDate) return false;
+        return true;
+      }
+      if (todo.endDate) {
+        return selectedDate >= todo.startDate && selectedDate <= todo.endDate;
+      }
+      return selectedDate === todo.startDate;
+    });
+  }, [todos, selectedDate, dow]);
+
+  const completionSet = useMemo(
+    () => new Set(completions.filter((c) => c.completedDate === selectedDate).map((c) => c.todoId)),
+    [completions, selectedDate]
   );
-  const completedTodos = todos.filter((t) =>
-    isCompleted(t.id, selectedDate)
-  );
+
+  const incompleteTodos = dateTodos.filter((t) => !completionSet.has(t.id));
+  const completedTodos = dateTodos.filter((t) => completionSet.has(t.id));
 
   return (
     <motion.div
@@ -56,7 +74,7 @@ export function TodoList() {
       </div>
 
       {/* Todo Items */}
-      {todos.length === 0 ? (
+      {dateTodos.length === 0 ? (
         <div className="flex-1 flex items-center justify-center py-32">
           <p
             className="text-[15px] text-text-tertiary"
@@ -67,7 +85,6 @@ export function TodoList() {
         </div>
       ) : (
         <div>
-          {/* Incomplete */}
           {incompleteTodos.map((todo, i) => (
             <motion.div
               key={todo.id}
@@ -87,7 +104,6 @@ export function TodoList() {
             </motion.div>
           ))}
 
-          {/* Completed */}
           {completedTodos.length > 0 && (
             <>
               <div className="h-px bg-border-subtle my-3" />
@@ -105,7 +121,6 @@ export function TodoList() {
         </div>
       )}
 
-      {/* Add Todo */}
       <TodoAdd date={selectedDate} />
     </motion.div>
   );
