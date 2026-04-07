@@ -80,8 +80,8 @@ export const useCalendarStore = create<CalendarState>()(
           const todo = await api.createTodo(todoData);
           set((s) => ({ todos: [...s.todos, todo], isLoading: false }));
         } catch (error) {
-          console.error("addTodo failed:", error);
           set({ isLoading: false });
+          throw error;
         }
       },
 

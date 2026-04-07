@@ -22,6 +22,7 @@ export function TodoAdd({ date }: TodoAddProps) {
   const [isRoutine, setIsRoutine] = useState(false);
   const [routineDays, setRoutineDays] = useState<number[]>([]);
   const [endDate, setEndDate] = useState("");
+  const [error, setError] = useState<string | null>(null);
 
   const resetForm = () => {
     setTitle("");
@@ -34,19 +35,23 @@ export function TodoAdd({ date }: TodoAddProps) {
   const handleSubmit = async () => {
     if (!title.trim()) return;
     if (isRoutine && routineDays.length === 0) return;
+    setError(null);
 
-    await addTodo({
-      categoryId: selectedCategoryId,
-      title: title.trim(),
-      startDate: date,
-      endDate: !isRoutine && endDate ? endDate : null,
-      isRoutine,
-      routineDays: isRoutine ? routineDays : null,
-      routineEndDate: null,
-      sortOrder: Date.now(),
-    });
-
-    resetForm();
+    try {
+      await addTodo({
+        categoryId: selectedCategoryId,
+        title: title.trim(),
+        startDate: date,
+        endDate: !isRoutine && endDate ? endDate : null,
+        isRoutine,
+        routineDays: isRoutine ? routineDays : null,
+        routineEndDate: null,
+        sortOrder: Date.now(),
+      });
+      resetForm();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "추가 실패");
+    }
   };
 
   const toggleDay = (dow: number) => {
@@ -196,6 +201,9 @@ export function TodoAdd({ date }: TodoAddProps) {
                   취소
                 </motion.button>
               </div>
+              {error && (
+                <p className="text-cat-coral text-xs mt-2">{error}</p>
+              )}
             </div>
           </motion.div>
         ) : (
