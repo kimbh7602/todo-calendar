@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import type { User } from "@supabase/supabase-js";
+import type { User, AuthChangeEvent, Session } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase";
 import { LoginScreen } from "./LoginScreen";
 
@@ -16,34 +16,33 @@ export function AuthGuard({ children }: AuthGuardProps) {
   useEffect(() => {
     const supabase = createClient();
 
-    // Check current session
-    supabase.auth.getUser().then(({ data: { user } }) => {
-      setUser(user);
+    supabase.auth.getUser().then((res: { data: { user: User | null } }) => {
+      setUser(res.data.user);
       setLoading(false);
     });
 
-    // Listen for auth changes
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (_event, session) => {
-      const currentUser = session?.user ?? null;
-      setUser(currentUser);
-      setLoading(false);
+    } = supabase.auth.onAuthStateChange(
+      async (_event: AuthChangeEvent, session: Session | null) => {
+        const currentUser = session?.user ?? null;
+        setUser(currentUser);
+        setLoading(false);
 
-      // Ensure profile exists on login/signup
-      if (currentUser) {
-        await supabase.from("profiles").upsert(
-          {
-            id: currentUser.id,
-            display_name:
-              currentUser.user_metadata?.display_name ||
-              currentUser.email?.split("@")[0] ||
-              "사용자",
-          },
-          { onConflict: "id" }
-        );
+        if (currentUser) {
+          await supabase.from("profiles").upsert(
+            {
+              id: currentUser.id,
+              display_name:
+                currentUser.user_metadata?.display_name ||
+                currentUser.email?.split("@")[0] ||
+                "사용자",
+            },
+            { onConflict: "id" }
+          );
+        }
       }
-    });
+    );
 
     return () => subscription.unsubscribe();
   }, []);

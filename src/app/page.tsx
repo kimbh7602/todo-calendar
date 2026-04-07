@@ -12,17 +12,14 @@ import { createSupabaseProvider } from "@/lib/supabase-provider";
 export default function Home() {
   const selectDate = useCalendarStore((s) => s.selectDate);
 
-  // Hydrate Zustand persist store
   useEffect(() => {
     useCalendarStore.persist.rehydrate();
   }, []);
 
-  // Handle browser back button
   useEffect(() => {
     const handlePopState = () => {
       selectDate(null);
     };
-
     window.addEventListener("popstate", handlePopState);
     return () => window.removeEventListener("popstate", handlePopState);
   }, [selectDate]);
@@ -34,28 +31,53 @@ export default function Home() {
   );
 }
 
-const supabaseProvider = typeof window !== "undefined" ? createSupabaseProvider() : null;
-
 function AppContent() {
   const selectedDate = useCalendarStore((s) => s.selectedDate);
   const [initialized, setInitialized] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (initialized || !supabaseProvider) return;
+    if (initialized) return;
 
-    api.setProvider(supabaseProvider);
+    const provider = createSupabaseProvider();
+    api.setProvider(provider);
 
-    Promise.all([
-      api.fetchCategories(),
-      api.fetchTodos(),
-      api.fetchCompletions(),
-    ]).then(([categories, todos, completions]) => {
-      useCalendarStore.setState({ categories, todos, completions });
-      setInitialized(true);
-    }).catch((error) => {
-      console.error("Failed to load data:", error);
-    });
+    async function loadData() {
+      try {
+        const [categories, todos, completions] = await Promise.all([
+          api.fetchCategories(),
+          api.fetchTodos(),
+          api.fetchCompletions(),
+        ]);
+
+        console.log("Loaded:", { categories: categories.length, todos: todos.length, completions: completions.length });
+
+        useCalendarStore.setState({ categories, todos, completions });
+        setInitialized(true);
+      } catch (err) {
+        console.error("Failed to load data:", err);
+        setError(err instanceof Error ? err.message : "데이터를 불러오지 못했습니다.");
+      }
+    }
+
+    loadData();
   }, [initialized]);
+
+  if (error) {
+    return (
+      <main className="max-w-[420px] mx-auto w-full min-h-screen flex items-center justify-center px-8">
+        <div className="text-center">
+          <p className="text-cat-coral text-sm mb-4">{error}</p>
+          <button
+            onClick={() => { setError(null); setInitialized(false); }}
+            className="text-cat-cyan text-sm"
+          >
+            다시 시도
+          </button>
+        </div>
+      </main>
+    );
+  }
 
   if (!initialized) {
     return (
