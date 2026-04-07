@@ -5,6 +5,7 @@ import { motion, useAnimation, PanInfo } from "framer-motion";
 import { useCalendarStore } from "@/stores/calendarStore";
 import { getMonthDays, formatDate, isToday, getWeekdayLabel } from "@/lib/date";
 import { springs } from "@/lib/springs";
+import { createClient } from "@/lib/supabase";
 import { CompletionRing } from "./CompletionRing";
 import { MultiDayBar, OverflowIndicator } from "./MultiDayBar";
 import { splitByWeek, assignSlots, getOverflowCounts } from "@/lib/multiday";
@@ -271,10 +272,16 @@ function CalendarHeader({
   onPrev: () => void;
   onNext: () => void;
 }) {
+  const handleLogout = async () => {
+    const supabase = createClient();
+    await supabase.auth.signOut();
+    window.location.reload();
+  };
+
   return (
     <div className="flex items-center justify-between mb-4">
       <h1 className="text-xl font-bold tracking-tight">{label}</h1>
-      <div className="flex gap-2">
+      <div className="flex gap-2 items-center">
         <motion.button
           onClick={onPrev}
           className="w-8 h-8 rounded-full bg-bg-elevated flex items-center justify-center text-text-secondary text-sm"
@@ -288,6 +295,13 @@ function CalendarHeader({
           whileTap={{ scale: 0.9 }}
         >
           ›
+        </motion.button>
+        <motion.button
+          onClick={handleLogout}
+          className="w-8 h-8 rounded-full bg-bg-elevated flex items-center justify-center text-text-tertiary text-[10px]"
+          whileTap={{ scale: 0.9 }}
+        >
+          ⏻
         </motion.button>
       </div>
     </div>
