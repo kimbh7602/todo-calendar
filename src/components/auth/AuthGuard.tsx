@@ -1,35 +1,32 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import type { User, AuthChangeEvent, Session } from "@supabase/supabase-js";
+import type { User } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase";
 import { LoginScreen } from "./LoginScreen";
 
-interface AuthGuardProps {
-  children: React.ReactNode;
-}
+/* eslint-disable @typescript-eslint/no-explicit-any */
 
-export function AuthGuard({ children }: AuthGuardProps) {
+export function AuthGuard({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const supabase = createClient();
 
-    supabase.auth.getUser().then((res: { data: { user: User | null } }) => {
-      setUser(res.data.user);
+    supabase.auth.getSession().then((result: any) => {
+      setUser(result.data.session?.user ?? null);
+      setLoading(false);
+    }).catch(() => {
       setLoading(false);
     });
 
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange(
-      async (_event: AuthChangeEvent, session: Session | null) => {
+    const { data } = supabase.auth.onAuthStateChange(
+      async (_event: any, session: any) => {
         const currentUser = session?.user ?? null;
         setUser(currentUser);
-        setLoading(false);
 
-        if (currentUser) {
+        if (currentUser && (_event === "SIGNED_IN" || _event === "USER_UPDATED")) {
           await supabase.from("profiles").upsert(
             {
               id: currentUser.id,
@@ -39,17 +36,17 @@ export function AuthGuard({ children }: AuthGuardProps) {
                 "사용자",
             },
             { onConflict: "id" }
-          );
+          ).catch(() => {});
         }
       }
     );
 
-    return () => subscription.unsubscribe();
+    return () => data.subscription.unsubscribe();
   }, []);
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center bg-bg-primary">
         <div
           className="w-5 h-5 border-2 border-cat-cyan border-t-transparent rounded-full"
           style={{ animation: "spin 0.8s linear infinite" }}
@@ -58,9 +55,7 @@ export function AuthGuard({ children }: AuthGuardProps) {
     );
   }
 
-  if (!user) {
-    return <LoginScreen />;
-  }
+  if (!user) return <LoginScreen />;
 
   return <>{children}</>;
 }
