@@ -46,7 +46,7 @@ export function TodoAdd({ date }: TodoAddProps) {
         isRoutine,
         routineDays: isRoutine ? routineDays : null,
         routineEndDate: null,
-        sortOrder: Date.now(),
+        sortOrder: Math.floor(Date.now() / 1000) % 1000000,
       });
       resetForm();
     } catch (err) {
