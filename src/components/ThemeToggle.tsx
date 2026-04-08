@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { motion } from "framer-motion";
 
 export function ThemeToggle() {
   const [dark, setDark] = useState(false);
@@ -22,14 +21,12 @@ export function ThemeToggle() {
   };
 
   return (
-    <motion.button
+    <button
       onClick={toggle}
-      className="w-9 h-9 rounded-full border-2 border-border-subtle bg-bg-primary flex items-center justify-center text-lg"
-      whileTap={{ scale: 0.85 }}
-      whileHover={{ scale: 1.05 }}
+      className="gum-btn w-9 h-9 text-sm"
       aria-label={dark ? "라이트 모드로 전환" : "다크 모드로 전환"}
     >
       {dark ? "☀️" : "🌙"}
-    </motion.button>
+    </button>
   );
 }

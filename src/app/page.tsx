@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { AnimatePresence, LayoutGroup } from "framer-motion";
+import { AnimatePresence, LayoutGroup, motion } from "framer-motion";
 import { useCalendarStore } from "@/stores/calendarStore";
 import { CalendarGrid } from "@/components/calendar/CalendarGrid";
 import { TodoList } from "@/components/todo/TodoList";
@@ -13,36 +13,28 @@ export default function Home() {
   const selectDate = useCalendarStore((s) => s.selectDate);
   const selectedDate = useCalendarStore((s) => s.selectedDate);
 
-  useEffect(() => {
-    useCalendarStore.persist.rehydrate();
-  }, []);
+  useEffect(() => { useCalendarStore.persist.rehydrate(); }, []);
 
   useEffect(() => {
     const isMobile = !window.matchMedia?.("(min-width: 1024px)")?.matches;
-    if (!isMobile) return;
-    if (selectedDate) {
-      window.history.pushState({ view: "todo" }, "");
-    }
+    if (!isMobile || !selectedDate) return;
+    window.history.pushState({ view: "todo" }, "");
   }, [selectedDate]);
 
   useEffect(() => {
     const handlePopState = () => {
-      const currentDate = useCalendarStore.getState().selectedDate;
-      if (currentDate) selectDate(null);
+      if (useCalendarStore.getState().selectedDate) selectDate(null);
     };
     window.addEventListener("popstate", handlePopState);
     return () => window.removeEventListener("popstate", handlePopState);
   }, [selectDate]);
 
-  return (
-    <AuthGuard>
-      <AppContent />
-    </AuthGuard>
-  );
+  return <AuthGuard><AppContent /></AuthGuard>;
 }
 
 function AppContent() {
   const selectedDate = useCalendarStore((s) => s.selectedDate);
+  const selectDate = useCalendarStore((s) => s.selectDate);
   const [initialized, setInitialized] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -50,14 +42,9 @@ function AppContent() {
     if (initialized) return;
     const provider = createSupabaseProvider();
     api.setProvider(provider);
-
     async function loadData() {
       try {
-        const [categories, todos, completions] = await Promise.all([
-          api.fetchCategories(),
-          api.fetchTodos(),
-          api.fetchCompletions(),
-        ]);
+        const [categories, todos, completions] = await Promise.all([api.fetchCategories(), api.fetchTodos(), api.fetchCompletions()]);
         useCalendarStore.setState({ categories, todos, completions });
         setInitialized(true);
       } catch (err) {
@@ -71,14 +58,9 @@ function AppContent() {
   if (error) {
     return (
       <main className="min-h-screen flex items-center justify-center px-6">
-        <div className="text-center">
-          <p className="text-error text-sm font-medium mb-4">{error}</p>
-          <button
-            onClick={() => { setError(null); setInitialized(false); }}
-            className="px-6 py-2 rounded-full bg-accent text-black text-sm font-bold"
-          >
-            다시 시도
-          </button>
+        <div className="gum-card p-8 text-center max-w-sm">
+          <p className="text-error text-sm font-bold mb-4">{error}</p>
+          <button onClick={() => { setError(null); setInitialized(false); }} className="gum-btn-pink px-6 py-2 text-sm">다시 시도</button>
         </div>
       </main>
     );
@@ -95,26 +77,37 @@ function AppContent() {
   return (
     <main className="min-h-screen">
       <LayoutGroup>
-        {/* Desktop: fullscreen calendar + side panel */}
+        {/* Desktop: fullscreen calendar + closable side panel */}
         <div className="hidden lg:flex min-h-screen">
           <div className="flex-1 min-w-0">
             <CalendarGrid />
           </div>
-          {selectedDate && (
-            <div className="w-[420px] flex-shrink-0 border-l-2 border-border-subtle overflow-y-auto">
-              <TodoList desktopMode />
-            </div>
-          )}
+          <AnimatePresence>
+            {selectedDate && (
+              <motion.div
+                className="w-[420px] flex-shrink-0 border-l-2 border-border-subtle overflow-y-auto relative"
+                initial={{ width: 0, opacity: 0 }}
+                animate={{ width: 420, opacity: 1 }}
+                exit={{ width: 0, opacity: 0 }}
+                transition={{ type: "spring", stiffness: 300, damping: 30 }}
+              >
+                {/* Close button */}
+                <button
+                  onClick={() => selectDate(null)}
+                  className="absolute top-4 right-4 z-10 w-8 h-8 gum-btn text-sm flex items-center justify-center"
+                >
+                  ✕
+                </button>
+                <TodoList desktopMode />
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
 
         {/* Mobile/Tablet */}
         <div className="lg:hidden">
           <AnimatePresence mode="wait">
-            {selectedDate ? (
-              <TodoList key="todo" />
-            ) : (
-              <CalendarGrid key="calendar" />
-            )}
+            {selectedDate ? <TodoList key="todo" /> : <CalendarGrid key="calendar" />}
           </AnimatePresence>
         </div>
       </LayoutGroup>

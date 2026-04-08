@@ -17,6 +17,7 @@ export function CalendarGrid() {
   const currentYear = useCalendarStore((s) => s.currentYear);
   const currentMonth = useCalendarStore((s) => s.currentMonth);
   const selectDate = useCalendarStore((s) => s.selectDate);
+  const selectedDate = useCalendarStore((s) => s.selectedDate);
   const todos = useCalendarStore((s) => s.todos);
   const completions = useCalendarStore((s) => s.completions);
   const categories = useCalendarStore((s) => s.categories);
@@ -76,26 +77,31 @@ export function CalendarGrid() {
 
   const numWeeks = Math.ceil(days.length / 7);
 
+  const handleLogout = async () => { const supabase = createClient(); await supabase.auth.signOut(); window.location.reload(); };
+
   return (
-    <div className="h-full flex flex-col px-4 lg:px-6 pt-6 lg:pt-4 pb-4">
-      <div className="flex items-center justify-between mb-4">
-        <h1 className="text-[28px] lg:text-[32px] font-extrabold tracking-tight">{monthLabel}</h1>
-        <div className="flex gap-1.5 items-center">
-          <NavButton onClick={prevMonth}>‹</NavButton>
-          <NavButton onClick={nextMonth}>›</NavButton>
+    <div className="h-full flex flex-col">
+      {/* Header — Gumroad-style top bar */}
+      <div className="flex items-center justify-between px-4 lg:px-6 py-3 border-b-2 border-border-subtle">
+        <h1 className="text-[24px] lg:text-[28px] font-black tracking-tight">{monthLabel}</h1>
+        <div className="flex gap-2 items-center">
+          <button onClick={prevMonth} className="gum-btn w-9 h-9 text-lg">‹</button>
+          <button onClick={nextMonth} className="gum-btn w-9 h-9 text-lg">›</button>
           <ThemeToggle />
-          <LogoutButton />
+          <button onClick={handleLogout} className="gum-btn w-9 h-9 text-xs" aria-label="로그아웃">⏻</button>
         </div>
       </div>
 
-      <div className="grid grid-cols-7 mb-1">
+      {/* Weekday labels */}
+      <div className="grid grid-cols-7 border-b-2 border-border-subtle">
         {WEEKDAYS.map((dow) => (
-          <div key={dow} className="text-center text-[12px] font-semibold text-text-tertiary py-1 uppercase">
+          <div key={dow} className="text-center text-[12px] font-bold text-text-secondary py-2 uppercase border-r-2 border-border-subtle last:border-r-0">
             {getWeekdayLabel(dow)}
           </div>
         ))}
       </div>
 
+      {/* Grid — fills remaining space */}
       <motion.div
         ref={gridRef}
         className="flex-1"
@@ -118,22 +124,29 @@ export function CalendarGrid() {
                 {weekDays.map((cell, colIdx) => {
                   const isCurrentMonth = cell.date.getMonth() === currentMonth;
                   const today = isToday(cell.date);
+                  const isSelected = cell.dateStr === selectedDate;
 
                   return (
                     <motion.button
                       key={`${cell.dateStr}-${weekIdx * 7 + colIdx}`}
                       layoutId={`day-${cell.dateStr}`}
                       onClick={() => selectDate(cell.dateStr)}
-                      className={`relative flex flex-col items-center pt-2 min-h-[60px] lg:min-h-0 lg:aspect-square border border-transparent transition-colors ${isCurrentMonth ? "" : "opacity-25"} ${today ? "" : "hover:bg-bg-secondary"}`}
-                      whileTap={{ scale: 0.95 }}
+                      className={`
+                        relative flex flex-col items-center pt-2 min-h-[56px] lg:min-h-0 lg:aspect-square
+                        border-r-2 border-b-2 border-border-subtle last:border-r-0 transition-colors
+                        ${isCurrentMonth ? "" : "opacity-20"}
+                        ${isSelected ? "bg-accent/15" : ""}
+                        ${!isSelected && !today ? "hover:bg-bg-secondary" : ""}
+                      `}
+                      whileTap={{ scale: 0.96 }}
                     >
                       <div className="relative w-8 h-8 flex items-center justify-center">
                         {today ? (
-                          <span className="w-8 h-8 rounded-full bg-accent text-black flex items-center justify-center text-[14px] font-bold" style={{ animation: "today-pulse 2s ease-in-out 3" }}>
+                          <span className="w-8 h-8 rounded-full bg-accent text-black flex items-center justify-center text-[14px] font-black" style={{ animation: "today-pulse 2s ease-in-out 3" }}>
                             {cell.date.getDate()}
                           </span>
                         ) : (
-                          <span className="text-[14px] font-semibold">{cell.date.getDate()}</span>
+                          <span className={`text-[14px] font-bold ${isSelected ? "text-accent" : ""}`}>{cell.date.getDate()}</span>
                         )}
                         {cell.rate >= 0 && <CompletionRing rate={cell.rate} color={cell.dotColors[0] || "#FF90E8"} />}
                       </div>
@@ -165,22 +178,5 @@ export function CalendarGrid() {
         })}
       </motion.div>
     </div>
-  );
-}
-
-function NavButton({ onClick, children }: { onClick: () => void; children: React.ReactNode }) {
-  return (
-    <motion.button onClick={onClick} className="w-9 h-9 rounded-full border-2 border-border-subtle bg-bg-primary flex items-center justify-center text-text-primary text-lg font-bold" whileTap={{ scale: 0.85 }} whileHover={{ scale: 1.05 }}>
-      {children}
-    </motion.button>
-  );
-}
-
-function LogoutButton() {
-  const handleLogout = async () => { const supabase = createClient(); await supabase.auth.signOut(); window.location.reload(); };
-  return (
-    <motion.button onClick={handleLogout} className="w-9 h-9 rounded-full border-2 border-border-subtle bg-bg-primary flex items-center justify-center text-text-tertiary text-xs font-bold" whileTap={{ scale: 0.85 }} aria-label="로그아웃">
-      ⏻
-    </motion.button>
   );
 }
