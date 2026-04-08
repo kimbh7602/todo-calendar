@@ -21,29 +21,27 @@ export function TodoItem({
   category,
   completed = false,
 }: TodoItemProps) {
-  const { toggleCompletion, getTodosForDate, isCompleted } =
-    useCalendarStore();
+  const toggleCompletion = useCalendarStore((s) => s.toggleCompletion);
+  const getTodosForDate = useCalendarStore((s) => s.getTodosForDate);
+  const isCompleted = useCalendarStore((s) => s.isCompleted);
   const checkboxRef = useRef<HTMLButtonElement>(null);
   const [scope, animate] = useAnimate();
 
-  const color = category?.color || "#5CC8FF";
+  const color = category?.color || "var(--color-accent)";
 
   const handleToggle = async () => {
     const wasCompleted = isCompleted(todo.id, date);
     await toggleCompletion(todo.id, date);
 
     if (!wasCompleted && checkboxRef.current) {
-      // Play sound
       playCompletionSound();
 
-      // Animate checkbox bounce
       await animate(
         checkboxRef.current,
         { scale: [1, 1.3, 1] },
         { duration: 0.25, type: "spring", ...springs.check }
       );
 
-      // Spawn particles from checkbox position
       const rect = checkboxRef.current.getBoundingClientRect();
       spawnParticles(
         rect.left + rect.width / 2,
@@ -51,7 +49,6 @@ export function TodoItem({
         color
       );
 
-      // Check if all todos for this day are now complete
       const allTodos = getTodosForDate(date);
       const allDone = allTodos.every((t) =>
         t.id === todo.id ? true : isCompleted(t.id, date)
@@ -65,7 +62,7 @@ export function TodoItem({
   return (
     <div
       ref={scope}
-      className={`flex items-center gap-3 py-3.5 border-b border-border-subtle ${
+      className={`flex items-center gap-3 py-3 rounded-[var(--radius-sm)] transition-colors ${
         completed ? "opacity-50" : ""
       }`}
     >
@@ -73,7 +70,7 @@ export function TodoItem({
       <motion.button
         ref={checkboxRef}
         onClick={handleToggle}
-        className="w-[22px] h-[22px] rounded-[4px] border-2 flex items-center justify-center flex-shrink-0 transition-colors"
+        className="w-[22px] h-[22px] rounded-[var(--radius-sm)] border-2 flex items-center justify-center flex-shrink-0 transition-colors"
         style={{
           borderColor: color,
           backgroundColor: completed ? color : "transparent",
@@ -81,13 +78,13 @@ export function TodoItem({
         whileTap={{ scale: 0.9 }}
       >
         {completed && (
-          <span className="text-bg-primary text-[13px] font-bold">✓</span>
+          <span className="text-white text-[13px] font-bold">✓</span>
         )}
       </motion.button>
 
       {/* Title */}
       <span
-        className={`flex-1 text-base ${
+        className={`flex-1 text-[15px] leading-relaxed ${
           completed
             ? "text-text-tertiary line-through"
             : "text-text-primary"
@@ -99,9 +96,9 @@ export function TodoItem({
       {/* Category Badge */}
       {category && (
         <span
-          className="text-[11px] font-semibold tracking-wide px-2 py-0.5 rounded-full"
+          className="text-[11px] font-semibold tracking-wide px-2.5 py-0.5 rounded-full"
           style={{
-            backgroundColor: `${color}26`,
+            backgroundColor: `${color}1F`,
             color,
           }}
         >

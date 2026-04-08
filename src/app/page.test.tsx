@@ -57,7 +57,8 @@ describe("Home", () => {
     const now = new Date();
     const monthLabel = `${now.getFullYear()}년 ${now.getMonth() + 1}월`;
     await waitFor(() => {
-      expect(screen.getByText(monthLabel)).toBeInTheDocument();
+      const elements = screen.getAllByText(monthLabel);
+      expect(elements.length).toBeGreaterThan(0);
     });
   });
 });

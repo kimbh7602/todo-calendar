@@ -10,7 +10,7 @@ interface TodoAddProps {
   date: string;
 }
 
-const WEEKDAYS = [0, 1, 2, 3, 4, 5, 6]; // Sun..Sat
+const WEEKDAYS = [0, 1, 2, 3, 4, 5, 6];
 
 export function TodoAdd({ date }: TodoAddProps) {
   const [isAdding, setIsAdding] = useState(false);
@@ -61,7 +61,7 @@ export function TodoAdd({ date }: TodoAddProps) {
   };
 
   return (
-    <div className="mt-4">
+    <div className="mt-3">
       <AnimatePresence mode="wait">
         {isAdding ? (
           <motion.div
@@ -72,7 +72,7 @@ export function TodoAdd({ date }: TodoAddProps) {
             transition={{ type: "spring", ...springs.reorder }}
             className="overflow-hidden"
           >
-            <div className="bg-bg-secondary rounded-lg p-4 border border-border-subtle">
+            <div className="bg-bg-elevated rounded-[var(--radius-md)] p-4 border border-border-subtle">
               <input
                 type="text"
                 value={title}
@@ -83,7 +83,7 @@ export function TodoAdd({ date }: TodoAddProps) {
                 }}
                 placeholder="할 일을 입력하세요"
                 autoFocus
-                className="w-full bg-transparent text-base text-text-primary placeholder:text-text-tertiary outline-none mb-3"
+                className="w-full bg-bg-secondary text-[15px] text-text-primary placeholder:text-text-tertiary outline-none mb-3 px-3 py-2.5 rounded-[var(--radius-md)] border border-border-subtle focus:border-accent focus:ring-2 focus:ring-accent/20 transition-all"
               />
 
               {/* Category selector */}
@@ -110,41 +110,28 @@ export function TodoAdd({ date }: TodoAddProps) {
                 ))}
               </div>
 
-              {/* Type toggle: 단일/멀티데이/루틴 */}
+              {/* Type toggle */}
               <div className="flex gap-2 mb-3">
-                <button
-                  onClick={() => { setIsRoutine(false); setEndDate(""); }}
-                  className={`text-[11px] font-semibold px-3 py-1 rounded-full transition-all ${
-                    !isRoutine && !endDate
-                      ? "bg-cat-cyan/25 text-cat-cyan border border-cat-cyan/40"
-                      : "bg-bg-elevated text-text-secondary border border-transparent"
-                  }`}
-                >
-                  단일
-                </button>
-                <button
-                  onClick={() => { setIsRoutine(false); setEndDate(date); }}
-                  className={`text-[11px] font-semibold px-3 py-1 rounded-full transition-all ${
-                    !isRoutine && endDate
-                      ? "bg-cat-cyan/25 text-cat-cyan border border-cat-cyan/40"
-                      : "bg-bg-elevated text-text-secondary border border-transparent"
-                  }`}
-                >
-                  기간
-                </button>
-                <button
-                  onClick={() => { setIsRoutine(true); setEndDate(""); }}
-                  className={`text-[11px] font-semibold px-3 py-1 rounded-full transition-all ${
-                    isRoutine
-                      ? "bg-cat-cyan/25 text-cat-cyan border border-cat-cyan/40"
-                      : "bg-bg-elevated text-text-secondary border border-transparent"
-                  }`}
-                >
-                  루틴
-                </button>
+                {[
+                  { label: "단일", active: !isRoutine && !endDate, onClick: () => { setIsRoutine(false); setEndDate(""); } },
+                  { label: "기간", active: !isRoutine && !!endDate, onClick: () => { setIsRoutine(false); setEndDate(date); } },
+                  { label: "루틴", active: isRoutine, onClick: () => { setIsRoutine(true); setEndDate(""); } },
+                ].map(({ label, active, onClick }) => (
+                  <button
+                    key={label}
+                    onClick={onClick}
+                    className={`text-[11px] font-semibold px-3 py-1 rounded-full transition-all ${
+                      active
+                        ? "bg-accent/15 text-accent border border-accent/30"
+                        : "bg-bg-secondary text-text-secondary border border-border-subtle"
+                    }`}
+                  >
+                    {label}
+                  </button>
+                ))}
               </div>
 
-              {/* End date picker (for multi-day) */}
+              {/* End date picker */}
               {!isRoutine && endDate && (
                 <div className="mb-3">
                   <label className="text-[11px] text-text-secondary block mb-1">
@@ -155,7 +142,7 @@ export function TodoAdd({ date }: TodoAddProps) {
                     value={endDate}
                     min={date}
                     onChange={(e) => setEndDate(e.target.value)}
-                    className="w-full bg-bg-elevated text-sm text-text-primary rounded-md px-3 py-2 border border-border-subtle outline-none"
+                    className="w-full bg-bg-secondary text-sm text-text-primary rounded-[var(--radius-md)] px-3 py-2 border border-border-subtle outline-none focus:border-accent transition-colors"
                   />
                 </div>
               )}
@@ -173,8 +160,8 @@ export function TodoAdd({ date }: TodoAddProps) {
                         onClick={() => toggleDay(dow)}
                         className={`w-8 h-8 rounded-full text-[11px] font-semibold transition-all ${
                           routineDays.includes(dow)
-                            ? "bg-cat-cyan text-bg-primary"
-                            : "bg-bg-elevated text-text-secondary"
+                            ? "bg-accent text-white"
+                            : "bg-bg-secondary text-text-secondary border border-border-subtle"
                         }`}
                       >
                         {getWeekdayLabel(dow)}
@@ -187,7 +174,7 @@ export function TodoAdd({ date }: TodoAddProps) {
               <div className="flex gap-2">
                 <motion.button
                   onClick={handleSubmit}
-                  className="flex-1 py-2.5 rounded-full bg-cat-cyan text-bg-primary text-sm font-semibold disabled:opacity-40"
+                  className="flex-1 py-2.5 rounded-full bg-accent text-white text-sm font-semibold disabled:opacity-40"
                   whileTap={{ scale: 0.97 }}
                   disabled={!title.trim() || (isRoutine && routineDays.length === 0)}
                 >
@@ -195,14 +182,14 @@ export function TodoAdd({ date }: TodoAddProps) {
                 </motion.button>
                 <motion.button
                   onClick={resetForm}
-                  className="px-4 py-2.5 rounded-full bg-bg-elevated text-text-secondary text-sm font-semibold"
+                  className="px-4 py-2.5 rounded-full bg-bg-secondary text-text-secondary text-sm font-semibold border border-border-subtle"
                   whileTap={{ scale: 0.97 }}
                 >
                   취소
                 </motion.button>
               </div>
               {error && (
-                <p className="text-cat-coral text-xs mt-2">{error}</p>
+                <p className="text-error text-xs mt-2">{error}</p>
               )}
             </div>
           </motion.div>
@@ -210,11 +197,11 @@ export function TodoAdd({ date }: TodoAddProps) {
           <motion.button
             key="button"
             onClick={() => setIsAdding(true)}
-            className="flex items-center gap-2 py-3.5 text-text-tertiary text-[15px] hover:text-text-secondary transition-colors w-full"
+            className="flex items-center gap-2 py-3 text-text-tertiary text-[15px] hover:text-text-secondary transition-colors w-full"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
           >
-            <span className="w-[22px] h-[22px] rounded-[4px] border-2 border-dashed border-text-tertiary flex items-center justify-center text-sm">
+            <span className="w-[22px] h-[22px] rounded-[var(--radius-sm)] border-2 border-dashed border-text-tertiary flex items-center justify-center text-sm">
               +
             </span>
             <span>할 일 추가</span>

@@ -48,7 +48,7 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-bg-primary">
         <div
-          className="w-5 h-5 border-2 border-cat-cyan border-t-transparent rounded-full"
+          className="w-5 h-5 border-2 border-accent border-t-transparent rounded-full"
           style={{ animation: "spin 0.8s linear infinite" }}
         />
       </div>

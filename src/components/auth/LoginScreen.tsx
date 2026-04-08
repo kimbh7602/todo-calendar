@@ -56,14 +56,14 @@ export function LoginScreen() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center px-8">
+    <div className="min-h-screen flex flex-col items-center justify-center px-4 md:px-8">
       <motion.div
         className="text-center mb-10"
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ type: "spring", ...springs.navigate }}
       >
-        <h1 className="text-[28px] font-bold tracking-tight mb-2">
+        <h1 className="text-[28px] font-bold tracking-tight text-text-primary mb-2">
           Living Calendar
         </h1>
         <p className="text-[15px] text-text-secondary">
@@ -73,42 +73,56 @@ export function LoginScreen() {
 
       <motion.form
         onSubmit={handleSubmit}
-        className="w-full max-w-[320px] flex flex-col gap-3"
+        className="w-full max-w-[360px] flex flex-col gap-3"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ type: "spring", ...springs.navigate, delay: 0.1 }}
       >
-        <input
-          type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          placeholder="이메일"
-          autoComplete="email"
-          className="w-full py-3 px-4 rounded-xl bg-bg-secondary text-text-primary text-[15px] placeholder:text-text-tertiary border border-border-subtle outline-none focus:border-cat-cyan transition-colors"
-        />
-        <input
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          placeholder="비밀번호"
-          autoComplete={mode === "signup" ? "new-password" : "current-password"}
-          className="w-full py-3 px-4 rounded-xl bg-bg-secondary text-text-primary text-[15px] placeholder:text-text-tertiary border border-border-subtle outline-none focus:border-cat-cyan transition-colors"
-        />
-
-        <motion.button
-          type="submit"
-          disabled={loading || !email.trim() || !password.trim()}
-          className="w-full py-3.5 rounded-full bg-cat-cyan text-bg-primary text-[15px] font-semibold disabled:opacity-40 mt-1"
-          whileTap={{ scale: 0.97 }}
+        <div
+          className="bg-bg-secondary rounded-[var(--radius-lg)] border border-border-subtle p-6"
+          style={{ boxShadow: "var(--shadow-card)" }}
         >
-          {loading ? (
-            <Spinner />
-          ) : mode === "login" ? (
-            "로그인"
-          ) : (
-            "회원가입"
+          <div className="flex flex-col gap-3">
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="이메일"
+              autoComplete="email"
+              className="w-full py-3 px-4 rounded-[var(--radius-md)] bg-bg-primary text-text-primary text-[15px] placeholder:text-text-tertiary border border-border-subtle outline-none focus:border-accent focus:ring-2 focus:ring-accent/20 transition-all"
+            />
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="비밀번호"
+              autoComplete={mode === "signup" ? "new-password" : "current-password"}
+              className="w-full py-3 px-4 rounded-[var(--radius-md)] bg-bg-primary text-text-primary text-[15px] placeholder:text-text-tertiary border border-border-subtle outline-none focus:border-accent focus:ring-2 focus:ring-accent/20 transition-all"
+            />
+
+            <motion.button
+              type="submit"
+              disabled={loading || !email.trim() || !password.trim()}
+              className="w-full py-3.5 rounded-full bg-accent text-white text-[15px] font-semibold disabled:opacity-40 mt-1"
+              whileTap={{ scale: 0.97 }}
+            >
+              {loading ? (
+                <Spinner />
+              ) : mode === "login" ? (
+                "로그인"
+              ) : (
+                "회원가입"
+              )}
+            </motion.button>
+          </div>
+
+          {error && (
+            <p className="text-error text-sm text-center mt-3">{error}</p>
           )}
-        </motion.button>
+          {message && (
+            <p className="text-success text-sm text-center mt-3">{message}</p>
+          )}
+        </div>
 
         <button
           type="button"
@@ -123,13 +137,6 @@ export function LoginScreen() {
             ? "계정이 없으신가요? 회원가입"
             : "이미 계정이 있으신가요? 로그인"}
         </button>
-
-        {error && (
-          <p className="text-cat-coral text-sm text-center">{error}</p>
-        )}
-        {message && (
-          <p className="text-cat-lime text-sm text-center">{message}</p>
-        )}
       </motion.form>
     </div>
   );
@@ -138,7 +145,7 @@ export function LoginScreen() {
 function Spinner() {
   return (
     <div
-      className="w-5 h-5 border-2 border-bg-primary border-t-transparent rounded-full mx-auto"
+      className="w-5 h-5 border-2 border-white border-t-transparent rounded-full mx-auto"
       style={{ animation: "spin 0.8s linear infinite" }}
     />
   );
