@@ -85,8 +85,7 @@ export function TodoList({ desktopMode = false }: TodoListProps) {
       </div>
 
       <div
-        className="bg-bg-secondary rounded-[var(--radius-md)] border border-border-subtle p-4"
-        style={{ boxShadow: "var(--shadow-card)" }}
+        className="glass-card rounded-[var(--radius-lg)] p-4"
       >
         {dateTodos.length === 0 ? (
           <div className="flex items-center justify-center py-16">

@@ -31,25 +31,27 @@
 | caption | 11px / 0.6875rem | 500 | 1.0 | 멀티데이 바 텍스트 |
 | day-number | 14px / 0.875rem | 500 (700 today) | 1.0 | 캘린더 날짜 |
 
-## Color
-- **Approach:** Warm neutral base + pastel category accents
+## Color (v3 — 2026 Trends: Dark Glassmorphism + Elevated Neutrals)
+- **Approach:** Elevated neutral base + glassmorphism cards + high-contrast dark mode
+- **Trends applied:** Dark Glassmorphism, Elevated Neutrals, Soft Gradients 2.0, Explosion of Color
 
-### Light Mode (기본)
+### Light Mode (기본) — Elevated Neutrals
+순백(#FFF) 대신 warm sand/clay 톤으로 눈의 피로 감소.
 
 #### Surfaces
 | Token | Hex | Usage |
 |-------|-----|-------|
-| --bg-primary | #FAFAF8 | 앱 배경 (warm white) |
-| --bg-secondary | #FFFFFF | 카드, 입력 필드 |
-| --bg-elevated | #F5F3EF | hover, 사이드바 |
-| --border-subtle | #E8E5DF | 구분선, 그리드 라인 |
+| --bg-primary | #EDE8E1 | 앱 배경 (warm sand) |
+| --bg-secondary | rgba(255,255,255,0.65) | 글래스모피즘 카드 (반투명) |
+| --bg-elevated | #E5E0D8 | hover, 사이드바 |
+| --border-subtle | rgba(0,0,0,0.08) | 구분선, 글래스 테두리 |
 
 #### Text
 | Token | Hex | Usage |
 |-------|-----|-------|
 | --text-primary | #1A1A1A | 주요 텍스트 |
-| --text-secondary | #6B6B6B | 날짜 숫자, 부가 정보 |
-| --text-tertiary | #A3A3A3 | 완료 항목, placeholder |
+| --text-secondary | #5C5C5C | 날짜 숫자, 부가 정보 |
+| --text-tertiary | #8C8C8C | 완료 항목, placeholder |
 
 #### Categories
 | Token | Hex | Name | Default Usage |
@@ -62,36 +64,45 @@
 | --cat-rose | #FF7EB3 | Rose | 소셜 |
 | --cat-teal | #26A69A | Teal | 재정 |
 
-각 카테고리 색상은 12% opacity variant를 배경으로 사용:
-`rgba(255, 107, 107, 0.12)` for coral background
+카테고리 색상은 15% opacity variant를 배경으로 사용
 
 #### Semantic
 | Token | Hex | Usage |
 |-------|-----|-------|
-| --accent | #4F6EF7 | CTA 버튼, 오늘 표시, 링크 |
+| --accent | #5B6EF5 | CTA 버튼, 오늘 표시, 링크 |
 | --success | #7CB342 | 완료, 성공 |
 | --warning | #F5A623 | 경고, 주의 |
 | --error | #FF6B6B | 오류, 삭제 |
 
 #### Today Indicator
-- 배경: accent color (#4F6EF7)
+- 배경: accent color (#5B6EF5)
 - 날짜 숫자: white
 - 원형: 28x28px, border-radius: 50%
 
-### Dark Mode
+### Dark Mode — Dark Glassmorphism
+깊은 검정 배경 + ambient gradient + 글래스모피즘 카드로 고대비 달성.
 
 | Token | Light | Dark |
 |-------|-------|------|
-| --bg-primary | #FAFAF8 | #1C1C1E |
-| --bg-secondary | #FFFFFF | #2C2C2E |
-| --bg-elevated | #F5F3EF | #3A3A3C |
-| --border-subtle | #E8E5DF | #48484A |
-| --text-primary | #1A1A1A | #F5F5F5 |
-| --text-secondary | #6B6B6B | #A1A1A6 |
-| --text-tertiary | #A3A3A3 | #636366 |
-| --accent | #4F6EF7 | #6B8AFF |
+| --bg-primary | #EDE8E1 | #0C0C10 |
+| --bg-secondary | rgba(255,255,255,0.65) | rgba(255,255,255,0.06) |
+| --bg-elevated | #E5E0D8 | rgba(255,255,255,0.10) |
+| --border-subtle | rgba(0,0,0,0.08) | rgba(255,255,255,0.10) |
+| --text-primary | #1A1A1A | #F0F0F2 |
+| --text-secondary | #5C5C5C | #9A9AA8 |
+| --text-tertiary | #8C8C8C | #5A5A68 |
+| --accent | #5B6EF5 | #7B8FFF |
 
-카테고리 색상은 다크모드에서 채도 -10%, 밝기 +5% 조정
+#### Ambient Gradient (다크모드 배경)
+- `radial-gradient(ellipse at 20% 50%, rgba(91,110,245,0.08), transparent 60%)`
+- `radial-gradient(ellipse at 80% 20%, rgba(171,123,255,0.06), transparent 50%)`
+- 미세한 accent/violet 오브가 배경에 떠서 glassmorphism 카드가 돋보이게 함
+
+#### Glassmorphism Card Style
+- `backdrop-filter: blur(12px)`
+- `border: 1px solid rgba(255,255,255,0.10)`
+- `box-shadow: 0 8px 32px rgba(0,0,0,0.2)`
+- `border-radius: var(--radius-lg)` (16px)
 
 ## Spacing
 - **Base unit:** 4px
@@ -132,11 +143,12 @@
 | --radius-lg | 16px | 투두 화면 컨테이너, 모달 |
 | --radius-full | 9999px | 버튼, 카테고리 뱃지, 오늘 표시 |
 
-### Card Style
-- Background: var(--bg-secondary)
+### Card Style (Glassmorphism)
+- Background: var(--bg-secondary) (반투명)
+- Backdrop-filter: blur(12px)
 - Border: 1px solid var(--border-subtle)
-- Shadow: 0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.02)
-- Border-radius: var(--radius-md)
+- Shadow: 0 4px 24px rgba(0,0,0,0.06) (light) / 0 8px 32px rgba(0,0,0,0.2) (dark)
+- Border-radius: var(--radius-lg) (16px)
 
 ## Motion
 - **Approach:** Intentional — 의미 있는 전환과 피드백

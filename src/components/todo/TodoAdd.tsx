@@ -72,7 +72,7 @@ export function TodoAdd({ date }: TodoAddProps) {
             transition={{ type: "spring", ...springs.reorder }}
             className="overflow-hidden"
           >
-            <div className="bg-bg-elevated rounded-[var(--radius-md)] p-4 border border-border-subtle">
+            <div className="glass-card rounded-[var(--radius-lg)] p-4">
               <input
                 type="text"
                 value={title}

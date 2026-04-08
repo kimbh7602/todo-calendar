@@ -79,8 +79,7 @@ export function LoginScreen() {
         transition={{ type: "spring", ...springs.navigate, delay: 0.1 }}
       >
         <div
-          className="bg-bg-secondary rounded-[var(--radius-lg)] border border-border-subtle p-6"
-          style={{ boxShadow: "var(--shadow-card)" }}
+          className="glass-card rounded-[var(--radius-lg)] p-6"
         >
           <div className="flex flex-col gap-3">
             <input
