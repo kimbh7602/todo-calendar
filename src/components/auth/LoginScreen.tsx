@@ -46,8 +46,8 @@ export function LoginScreen() {
             <span className="text-lg font-black tracking-tight">Living Calendar</span>
           </div>
           <div className="flex items-center gap-3">
-            <button onClick={() => { setShowForm(true); setMode("login"); }} className="gum-btn px-5 py-2 text-sm bg-white/60 dark:bg-black/30">로그인</button>
-            <button onClick={() => { setShowForm(true); setMode("signup"); }} className="gum-btn px-5 py-2 text-sm bg-black text-white border-black dark:bg-white dark:text-black dark:border-white">시작하기</button>
+            <button onClick={() => { setShowForm(true); setMode("login"); }} className="gum-btn px-5 py-2 text-sm">로그인</button>
+            <button onClick={() => { setShowForm(true); setMode("signup"); }} className="gum-btn-pink px-5 py-2 text-sm">시작하기</button>
           </div>
         </nav>
 
