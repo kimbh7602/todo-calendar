@@ -10,7 +10,6 @@ import { CompletionRing } from "./CompletionRing";
 import { MultiDayBar, OverflowIndicator } from "./MultiDayBar";
 import { splitByWeek, assignSlots, getOverflowCounts } from "@/lib/multiday";
 import { ThemeToggle } from "@/components/ThemeToggle";
-import { Doto } from "@/components/Doto";
 
 const WEEKDAYS = [0, 1, 2, 3, 4, 5, 6];
 
@@ -24,6 +23,7 @@ export function CalendarGrid() {
   const categories = useCalendarStore((s) => s.categories);
   const prevMonth = useCalendarStore((s) => s.prevMonth);
   const nextMonth = useCalendarStore((s) => s.nextMonth);
+  const getTodosForDate = useCalendarStore((s) => s.getTodosForDate);
 
   const days = useMemo(() => getMonthDays(currentYear, currentMonth), [currentYear, currentMonth]);
   const monthLabel = `${currentYear}년 ${currentMonth + 1}월`;
@@ -40,8 +40,6 @@ export function CalendarGrid() {
 
   useEffect(() => { setSwipeDirection(0); }, [currentYear, currentMonth]);
 
-  const getTodosForDate = useCalendarStore((s) => s.getTodosForDate);
-
   const cellData = useMemo(() => {
     const completionSet = new Set(completions.map((c) => `${c.todoId}:${c.completedDate}`));
     const catColorMap = new Map(categories.map((c) => [c.id, c.color]));
@@ -51,29 +49,15 @@ export function CalendarGrid() {
       const completedCount = dateTodos.filter((t) => completionSet.has(`${t.id}:${dateStr}`)).length;
       const rate = dateTodos.length === 0 ? -1 : completedCount / dateTodos.length;
       const dotColors = [...new Set(dateTodos.map((t) => t.categoryId ? catColorMap.get(t.categoryId) : undefined).filter(Boolean))].slice(0, 3) as string[];
-      const previews = dateTodos.slice(0, 3).map((t) => ({
+      const previews = dateTodos.slice(0, 2).map((t) => ({
         title: t.title,
         done: completionSet.has(`${t.id}:${dateStr}`),
         color: t.categoryId ? catColorMap.get(t.categoryId) : undefined,
       }));
-      const moreCount = Math.max(0, dateTodos.length - 3);
+      const moreCount = Math.max(0, dateTodos.length - 2);
       return { dateStr, date, rate, dotColors, previews, totalCount: dateTodos.length, completedCount, moreCount };
     });
   }, [days, todos, completions, categories, getTodosForDate]);
-
-  // Monthly stats
-  const monthStats = useMemo(() => {
-    let totalTodos = 0;
-    let totalCompleted = 0;
-    cellData.forEach((cell) => {
-      if (cell.date.getMonth() === currentMonth) {
-        totalTodos += cell.totalCount;
-        totalCompleted += cell.completedCount;
-      }
-    });
-    const rate = totalTodos === 0 ? 0 : Math.round((totalCompleted / totalTodos) * 100);
-    return { totalTodos, totalCompleted, rate };
-  }, [cellData, currentMonth]);
 
   const multiDaySegments = useMemo(() => {
     const multiDayTodos = todos.filter((t) => t.endDate && !t.isRoutine);
@@ -101,28 +85,33 @@ export function CalendarGrid() {
   const handleLogout = async () => { const supabase = createClient(); await supabase.auth.signOut(); window.location.reload(); };
 
   return (
-    <div className="h-full flex flex-col">
-      {/* Header — Pink energy bar */}
-      <div className="gum-header flex items-center justify-between px-4 lg:px-6 py-3">
+    <div className="h-full flex flex-col bg-bg-elevated rounded-lg lg:rounded-xl overflow-hidden border border-border">
+      {/* Header */}
+      <div className="flex items-center justify-between px-4 lg:px-5 py-3 border-b border-border">
         <div className="flex items-center gap-3">
-          <Doto mood="wave" size={32} className="hidden lg:block" />
-          <h1 className="text-[24px] lg:text-[28px] font-black tracking-tight">{monthLabel}</h1>
+          <button onClick={prevMonth} className="w-8 h-8 flex items-center justify-center rounded-lg text-text-secondary hover:bg-bg-secondary hover:text-text-primary transition-colors">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M10 12L6 8L10 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+          </button>
+          <h1 className="text-[17px] lg:text-[19px] font-semibold tracking-tight">{monthLabel}</h1>
+          <button onClick={nextMonth} className="w-8 h-8 flex items-center justify-center rounded-lg text-text-secondary hover:bg-bg-secondary hover:text-text-primary transition-colors">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M6 12L10 8L6 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+          </button>
         </div>
-        <div className="flex gap-2 items-center">
-          <button onClick={prevMonth} className="gum-btn w-9 h-9 text-lg ">‹</button>
-          <button onClick={nextMonth} className="gum-btn w-9 h-9 text-lg ">›</button>
+        <div className="flex gap-1.5 items-center">
           <ThemeToggle />
-          <button onClick={handleLogout} className="gum-btn w-9 h-9 text-xs " aria-label="로그아웃">⏻</button>
+          <button onClick={handleLogout} className="w-8 h-8 flex items-center justify-center rounded-lg text-text-secondary hover:bg-bg-secondary transition-colors" aria-label="로그아웃">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M6 14H3.333A1.333 1.333 0 012 12.667V3.333A1.333 1.333 0 013.333 2H6M10.667 11.333L14 8l-3.333-3.333M14 8H6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+          </button>
         </div>
       </div>
 
-      {/* Weekday labels — colored row */}
-      <div className="grid grid-cols-7 gum-weekday-row border-b-2 border-border-subtle">
+      {/* Weekday labels */}
+      <div className="grid grid-cols-7 border-b border-border">
         {WEEKDAYS.map((dow) => (
           <div
             key={dow}
-            className={`text-center text-[12px] font-black py-2.5 uppercase border-r-2 border-border-subtle last:border-r-0 ${
-              dow === 0 ? "gum-weekday-sun" : dow === 6 ? "gum-weekday-sat" : ""
+            className={`text-center text-[11px] font-medium py-2 ${
+              dow === 0 ? "text-sun" : dow === 6 ? "text-sat" : "text-text-tertiary"
             }`}
           >
             {getWeekdayLabel(dow)}
@@ -130,17 +119,17 @@ export function CalendarGrid() {
         ))}
       </div>
 
-      {/* Grid — fills remaining space */}
-      <div ref={gridRef} className="flex-1 flex flex-col min-h-0 overflow-hidden">
+      {/* Grid */}
+      <div ref={gridRef} className="flex-1 flex flex-col min-h-0">
         <motion.div
           className="flex-1 flex flex-col min-h-0"
           drag="x"
           dragConstraints={{ left: 0, right: 0 }}
-          dragElastic={0.2}
+          dragElastic={0.15}
           onDragEnd={handleDragEnd}
           animate={controls}
           key={`${currentYear}-${currentMonth}`}
-          initial={{ x: swipeDirection * 100, opacity: 0.5 }}
+          initial={{ x: swipeDirection * 80, opacity: 0.6 }}
           transition={{ type: "spring", ...springs.navigate }}
         >
           {Array.from({ length: numWeeks }, (_, weekIdx) => {
@@ -150,108 +139,84 @@ export function CalendarGrid() {
             return (
               <div key={weekIdx} className="relative flex-1 min-h-0 overflow-hidden">
                 <div className="grid grid-cols-7 h-full">
-                {weekDays.map((cell, colIdx) => {
-                  const isCurrentMonth = cell.date.getMonth() === currentMonth;
-                  const today = isToday(cell.date);
-                  const isSelected = cell.dateStr === selectedDate;
-                  const allDone = cell.rate === 1;
-                  const hasTodos = cell.totalCount > 0;
+                  {weekDays.map((cell, colIdx) => {
+                    const isCurrentMonth = cell.date.getMonth() === currentMonth;
+                    const today = isToday(cell.date);
+                    const isSelected = cell.dateStr === selectedDate;
 
-                  return (
-                    <motion.button
-                      key={`${cell.dateStr}-${weekIdx * 7 + colIdx}`}
-                      layoutId={`day-${cell.dateStr}`}
-                      onClick={() => selectDate(cell.dateStr)}
-                      className={`
-                        relative flex flex-col items-start pt-1.5 px-1 min-h-[56px] lg:min-h-0 h-full
-                        border-r-2 border-b-2 border-border-subtle last:border-r-0 transition-colors text-left
-                        ${isCurrentMonth ? "" : "opacity-20"}
-                        ${isSelected ? "bg-accent/20 ring-2 ring-inset ring-accent" : ""}
-                        ${!isSelected && allDone && hasTodos ? "gum-cell-all-done" : ""}
-                        ${!isSelected && !allDone && hasTodos ? "gum-cell-has-todos" : ""}
-                        ${!isSelected && !today ? "hover:bg-bg-elevated" : ""}
-                      `}
-                      whileTap={{ scale: 0.97 }}
-                    >
-                      {/* Date number row */}
-                      <div className="flex items-center gap-1 w-full">
-                        <div className="relative flex items-center justify-center">
+                    return (
+                      <button
+                        key={`${cell.dateStr}-${weekIdx * 7 + colIdx}`}
+                        onClick={() => selectDate(cell.dateStr)}
+                        className={`
+                          relative flex flex-col items-start pt-1.5 lg:pt-2 px-1 lg:px-1.5 min-h-[52px] h-full
+                          border-r border-b border-border-light transition-colors text-left
+                          ${isCurrentMonth ? "" : "opacity-30"}
+                          ${isSelected ? "bg-accent-light" : "hover:bg-bg-secondary"}
+                        `}
+                      >
+                        {/* Date */}
+                        <div className="flex items-center gap-0.5 w-full mb-0.5">
                           {today ? (
-                            <span className="w-7 h-7 rounded-full bg-accent text-black flex items-center justify-center text-[13px] font-black" style={{ animation: "today-pulse 2s ease-in-out 3" }}>
+                            <span className="w-6 h-6 rounded-full bg-accent text-white flex items-center justify-center text-[12px] font-semibold" style={{ animation: "today-pulse 2s ease-in-out 3" }}>
                               {cell.date.getDate()}
                             </span>
                           ) : (
-                            <span className={`text-[13px] font-bold w-7 h-7 flex items-center justify-center ${isSelected ? "text-accent" : colIdx === 0 ? "text-cat-red" : colIdx === 6 ? "text-cat-blue" : ""}`}>
+                            <span className={`text-[12px] font-medium w-6 h-6 flex items-center justify-center rounded-full ${
+                              isSelected ? "bg-accent text-white" : colIdx === 0 ? "text-sun" : colIdx === 6 ? "text-sat" : "text-text-primary"
+                            }`}>
                               {cell.date.getDate()}
                             </span>
                           )}
-                          {cell.rate >= 0 && <CompletionRing rate={cell.rate} color={cell.dotColors[0] || "#FF90E8"} size={26} />}
+                          {cell.rate > 0 && <CompletionRing rate={cell.rate} color={cell.dotColors[0] || "var(--color-accent)"} size={22} />}
                         </div>
-                        {/* Category dots — compact */}
+
+                        {/* Todo previews — desktop */}
+                        <div className="hidden lg:flex flex-col gap-px w-full overflow-hidden flex-1">
+                          {cell.previews.map((p, i) => (
+                            <div
+                              key={i}
+                              className={`text-[10px] leading-[14px] font-medium truncate rounded px-1 py-px ${
+                                p.done ? "line-through text-text-tertiary" : "text-text-primary"
+                              }`}
+                              style={p.color ? { backgroundColor: `${p.color}15`, borderLeft: `2px solid ${p.color}` } : { backgroundColor: "var(--color-bg-secondary)" }}
+                            >
+                              {p.title}
+                            </div>
+                          ))}
+                          {cell.moreCount > 0 && (
+                            <span className="text-[9px] font-medium text-text-tertiary px-1">+{cell.moreCount}개</span>
+                          )}
+                        </div>
+
+                        {/* Dots — mobile */}
                         {cell.dotColors.length > 0 && (
-                          <div className="flex gap-[2px]">
+                          <div className="flex gap-[3px] lg:hidden mt-0.5">
                             {cell.dotColors.map((color) => (
                               <span key={color} className="w-[5px] h-[5px] rounded-full" style={{ backgroundColor: color }} />
                             ))}
                           </div>
                         )}
-                      </div>
+                      </button>
+                    );
+                  })}
+                </div>
 
-                      {/* Todo previews — desktop only */}
-                      <div className="hidden lg:flex flex-col gap-[1px] mt-0.5 w-full overflow-hidden flex-1">
-                        {cell.previews.map((p, i) => (
-                          <div
-                            key={i}
-                            className={`gum-cell-preview ${p.done ? "gum-cell-preview-done" : ""}`}
-                            style={p.color ? { borderLeft: `2px solid ${p.color}`, paddingLeft: 3 } : undefined}
-                          >
-                            {p.title}
-                          </div>
-                        ))}
-                        {cell.moreCount > 0 && (
-                          <span className="text-[8px] font-black text-accent">+{cell.moreCount}</span>
-                        )}
-                      </div>
-                    </motion.button>
-                  );
-                })}
-              </div>
-
-              {cellWidth > 0 && weekSegments.filter((s) => s.slot !== -1).map((seg) => (
-                <MultiDayBar key={`bar-${seg.todo.id}-${seg.row}`} segment={seg} cellWidth={cellWidth} onTap={selectDate} />
-              ))}
-              {cellWidth > 0 && Array.from(overflowCounts.entries())
-                .filter(([key]) => key.startsWith(`${weekIdx}-`))
-                .map(([key, count]) => {
-                  const col = parseInt(key.split("-")[1]);
-                  const cellDate = weekDays[col]?.dateStr;
-                  if (!cellDate) return null;
-                  return <OverflowIndicator key={key} count={count} row={weekIdx} col={col} cellWidth={cellWidth} onTap={selectDate} date={cellDate} />;
-                })}
+                {cellWidth > 0 && weekSegments.filter((s) => s.slot !== -1).map((seg) => (
+                  <MultiDayBar key={`bar-${seg.todo.id}-${seg.row}`} segment={seg} cellWidth={cellWidth} onTap={selectDate} />
+                ))}
+                {cellWidth > 0 && Array.from(overflowCounts.entries())
+                  .filter(([key]) => key.startsWith(`${weekIdx}-`))
+                  .map(([key, count]) => {
+                    const col = parseInt(key.split("-")[1]);
+                    const cellDate = weekDays[col]?.dateStr;
+                    if (!cellDate) return null;
+                    return <OverflowIndicator key={key} count={count} row={weekIdx} col={col} cellWidth={cellWidth} onTap={selectDate} date={cellDate} />;
+                  })}
               </div>
             );
           })}
         </motion.div>
-      </div>
-
-      {/* Monthly Stats Bar */}
-      <div className="gum-stats-bar">
-        <span className="text-text-secondary text-[11px]">이번 달</span>
-        <span className="gum-stat-pill">
-          <span style={{ color: "var(--color-accent)" }}>●</span>
-          할 일 {monthStats.totalTodos}
-        </span>
-        <span className="gum-stat-pill">
-          <span style={{ color: "var(--color-success)" }}>✓</span>
-          완료 {monthStats.totalCompleted}
-        </span>
-        {monthStats.totalTodos > 0 && (
-          <span className={`gum-stat-pill ${monthStats.rate === 100 ? "!bg-accent/20 !border-accent" : ""}`}>
-            {monthStats.rate}%
-          </span>
-        )}
-        <div className="flex-1" />
-        <Doto mood={monthStats.rate === 100 ? "celebrate" : monthStats.rate >= 50 ? "wave" : "think"} size={28} />
       </div>
     </div>
   );

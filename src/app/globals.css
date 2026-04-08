@@ -1,68 +1,77 @@
 @import "tailwindcss";
 
-/* ===== v5: Gumroad Bold — Thick Borders + Pink Energy ===== */
+/* ===== v6: Content Calendar — Clean Minimal ===== */
 
 :root {
   --color-bg-primary: #FFFFFF;
-  --color-bg-secondary: #F4F4F0;
-  --color-bg-elevated: #E8E8E4;
-  --color-border-subtle: #000000;
+  --color-bg-secondary: #F8F9FA;
+  --color-bg-elevated: #FFFFFF;
+  --color-border: #E5E7EB;
+  --color-border-light: #F0F1F3;
 
-  --color-text-primary: #000000;
-  --color-text-secondary: #555555;
-  --color-text-tertiary: #999999;
+  --color-text-primary: #111827;
+  --color-text-secondary: #6B7280;
+  --color-text-tertiary: #9CA3AF;
 
-  --color-accent: #FF90E8;
-  --color-accent-hover: #FF6AD5;
-  --color-success: #23C45E;
-  --color-warning: #FFB800;
-  --color-error: #FF4444;
+  --color-accent: #6366F1;
+  --color-accent-light: #EEF2FF;
+  --color-accent-hover: #4F46E5;
+  --color-success: #10B981;
+  --color-success-light: #ECFDF5;
+  --color-warning: #F59E0B;
+  --color-error: #EF4444;
+  --color-error-light: #FEF2F2;
+
+  --color-sun: #EF4444;
+  --color-sat: #3B82F6;
 }
 
 .dark {
-  --color-bg-primary: #000000;
-  --color-bg-secondary: #141414;
-  --color-bg-elevated: #222222;
-  --color-border-subtle: #FFFFFF;
+  --color-bg-primary: #111111;
+  --color-bg-secondary: #1A1A1A;
+  --color-bg-elevated: #1F1F1F;
+  --color-border: #2E2E2E;
+  --color-border-light: #252525;
 
-  --color-text-primary: #FFFFFF;
-  --color-text-secondary: #AAAAAA;
-  --color-text-tertiary: #666666;
+  --color-text-primary: #F3F4F6;
+  --color-text-secondary: #9CA3AF;
+  --color-text-tertiary: #6B7280;
 
-  --color-accent: #FF90E8;
-  --color-accent-hover: #FF6AD5;
-  --color-success: #34D96B;
-  --color-warning: #FFD54F;
-  --color-error: #FF6B6B;
+  --color-accent: #818CF8;
+  --color-accent-light: rgba(99,102,241,0.1);
+  --color-accent-hover: #6366F1;
+  --color-success: #34D399;
+  --color-success-light: rgba(16,185,129,0.1);
+  --color-warning: #FBBF24;
+  --color-error: #F87171;
+  --color-error-light: rgba(239,68,68,0.1);
 }
 
 @theme {
   --color-bg-primary: var(--color-bg-primary);
   --color-bg-secondary: var(--color-bg-secondary);
   --color-bg-elevated: var(--color-bg-elevated);
-  --color-border-subtle: var(--color-border-subtle);
+  --color-border: var(--color-border);
+  --color-border-light: var(--color-border-light);
   --color-text-primary: var(--color-text-primary);
   --color-text-secondary: var(--color-text-secondary);
   --color-text-tertiary: var(--color-text-tertiary);
   --color-accent: var(--color-accent);
+  --color-accent-light: var(--color-accent-light);
   --color-accent-hover: var(--color-accent-hover);
   --color-success: var(--color-success);
+  --color-success-light: var(--color-success-light);
   --color-warning: var(--color-warning);
   --color-error: var(--color-error);
+  --color-error-light: var(--color-error-light);
+  --color-sun: var(--color-sun);
+  --color-sat: var(--color-sat);
 }
 
 @theme inline {
-  --color-cat-pink: #FF90E8;
-  --color-cat-yellow: #FFE14D;
-  --color-cat-green: #23C45E;
-  --color-cat-blue: #4DA6FF;
-  --color-cat-purple: #B266FF;
-  --color-cat-orange: #FF8A4D;
-  --color-cat-red: #FF4D6A;
-
-  --radius-sm: 4px;
-  --radius-md: 8px;
-  --radius-lg: 12px;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
   --radius-full: 9999px;
 
   --font-sans: "Pretendard Variable", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
@@ -70,199 +79,27 @@
 }
 
 body {
-  background: var(--color-bg-primary);
+  background: var(--color-bg-secondary);
   color: var(--color-text-primary);
   font-family: var(--font-sans);
 }
 
-/* ===== Gumroad-style Card ===== */
-.gum-card {
-  background: var(--color-bg-primary);
-  border: 2px solid var(--color-border-subtle);
-  border-radius: var(--radius-md);
-}
-
-.gum-card-pink {
-  background: var(--color-accent);
-  border: 2px solid var(--color-border-subtle);
-  border-radius: var(--radius-md);
-  color: #000000;
-}
-
-.gum-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 700;
-  border: 2px solid var(--color-border-subtle);
-  border-radius: var(--radius-full);
-  transition: all 0.15s ease;
-}
-
-.gum-btn:hover {
-  background: var(--color-accent);
-  color: #000000;
-}
-
-.gum-btn-pink {
-  background: var(--color-accent);
-  color: #000000;
-  font-weight: 700;
-  border: 2px solid var(--color-border-subtle);
-  border-radius: var(--radius-full);
-  transition: all 0.15s ease;
-}
-
-.gum-btn-pink:hover {
-  background: var(--color-accent-hover);
-}
-
-.gum-input {
-  width: 100%;
-  background: var(--color-bg-primary);
-  border: 2px solid var(--color-border-subtle);
-  border-radius: var(--radius-md);
-  padding: 12px 16px;
-  font-size: 15px;
-  outline: none;
-  transition: border-color 0.15s ease;
-}
-
-.gum-input:focus {
-  border-color: var(--color-accent);
-}
-
-.gum-input::placeholder {
-  color: var(--color-text-tertiary);
-}
-
-/* ===== Header Bar — Pink Energy ===== */
-.gum-header {
-  background: linear-gradient(180deg, var(--color-accent) 0%, color-mix(in srgb, var(--color-accent) 85%, #000) 100%);
-  border-bottom: 2px solid var(--color-border-subtle);
-  color: #000000;
-}
-
-.gum-header .gum-btn {
-  background: rgba(255,255,255,0.85);
-  border-color: rgba(0,0,0,0.15);
-  color: #000;
-}
-
-.gum-header .gum-btn:hover {
-  background: #FFFFFF;
-  border-color: rgba(0,0,0,0.3);
-}
-
-/* ===== Weekday Row ===== */
-.gum-weekday-row {
-  background: var(--color-bg-secondary);
-}
-
-.gum-weekday-sun {
-  color: #FF4D6A;
-}
-
-.gum-weekday-sat {
-  color: #4DA6FF;
-}
-
-/* ===== Cell with content — subtle fill ===== */
-.gum-cell-has-todos {
-  background: color-mix(in srgb, var(--color-accent) 6%, transparent);
-}
-
-.gum-cell-all-done {
-  background: color-mix(in srgb, var(--color-success) 8%, transparent);
-}
-
-/* ===== Cell Todo Preview ===== */
-.gum-cell-preview {
-  font-size: 10px;
-  line-height: 1.3;
-  font-weight: 700;
-  color: var(--color-text-primary);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  max-width: 100%;
-  padding: 0 2px;
-}
-
-.gum-cell-preview-done {
-  text-decoration: line-through;
-  color: var(--color-text-tertiary);
-}
-
-/* ===== Stats Bar ===== */
-.gum-stats-bar {
-  background: var(--color-bg-secondary);
-  border-top: 2px solid var(--color-border-subtle);
-  padding: 8px 16px;
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  font-size: 12px;
-  font-weight: 700;
-}
-
-.gum-stat-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  padding: 2px 10px;
-  border-radius: var(--radius-full);
-  border: 2px solid var(--color-border-subtle);
-  background: var(--color-bg-primary);
-  font-size: 11px;
-  font-weight: 800;
-}
-
-/* ===== Side Panel Header ===== */
-.gum-panel-header {
-  background: linear-gradient(180deg, var(--color-accent) 0%, color-mix(in srgb, var(--color-accent) 85%, #000) 100%);
-  border-bottom: 2px solid var(--color-border-subtle);
-  color: #000000;
-  padding: 16px 20px;
-}
-
-.gum-panel-header .gum-btn {
-  background: rgba(255,255,255,0.85);
-  border-color: rgba(0,0,0,0.15);
-  color: #000;
-}
-
-.gum-panel-header .gum-btn:hover {
-  background: #FFFFFF;
-}
-
 /* ===== Animations ===== */
-@keyframes breathe {
-  0%, 100% { opacity: 0.4; }
-  50% { opacity: 0.7; }
-}
-
 @keyframes spin {
   to { transform: rotate(360deg); }
 }
 
 @keyframes today-pulse {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(255, 144, 232, 0.5); }
-  50% { box-shadow: 0 0 0 6px rgba(255, 144, 232, 0); }
+  0%, 100% { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.3); }
+  50% { box-shadow: 0 0 0 4px rgba(99, 102, 241, 0); }
 }
 
 @keyframes float {
   0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-10px); }
+  50% { transform: translateY(-8px); }
 }
 
-@keyframes wave {
-  0%, 100% { transform: rotate(0deg); }
-  25% { transform: rotate(14deg); }
-  75% { transform: rotate(-14deg); }
-}
-
-@keyframes slideUp {
-  from { opacity: 0; transform: translateY(20px); }
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
   to { opacity: 1; transform: translateY(0); }
 }
