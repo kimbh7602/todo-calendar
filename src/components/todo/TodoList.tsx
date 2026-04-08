@@ -47,55 +47,82 @@ export function TodoList({ desktopMode = false }: TodoListProps) {
   const weekday = getWeekdayLabel(date.getDay()) + "요일";
   const incompleteTodos = dateTodos.filter((t) => !completionSet.has(t.id));
   const completedTodos = dateTodos.filter((t) => completionSet.has(t.id));
+  const allDone = dateTodos.length > 0 && completedTodos.length === dateTodos.length;
 
   return (
     <motion.div
-      className={desktopMode ? "p-5 pt-14 h-full" : "px-4 pt-4 pb-8 min-h-screen"}
+      className={desktopMode ? "h-full flex flex-col" : "min-h-screen flex flex-col"}
       initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.15 }}
     >
-      {/* Header */}
-      <div className="flex items-center gap-3 mb-5">
-        {!desktopMode && (
-          <button onClick={() => selectDate(null)} className="gum-btn w-9 h-9 text-sm font-bold">←</button>
+      {/* Pink header */}
+      <div className="gum-panel-header">
+        <div className="flex items-center gap-3">
+          {!desktopMode && (
+            <button onClick={() => selectDate(null)} className="gum-btn w-8 h-8 text-sm font-bold bg-white/60 dark:bg-black/30">←</button>
+          )}
+          {desktopMode && (
+            <button onClick={() => selectDate(null)} className="gum-btn w-7 h-7 text-xs font-bold bg-white/60 dark:bg-black/30">✕</button>
+          )}
+          <motion.div layoutId={desktopMode ? undefined : `day-${selectedDate}`}>
+            <h1 className="text-[22px] font-black tracking-tight">
+              {dayLabel}
+              <span className="text-[13px] font-bold opacity-70 ml-2">{weekday}</span>
+            </h1>
+          </motion.div>
+        </div>
+
+        {/* Mini stats in header */}
+        {dateTodos.length > 0 && (
+          <div className="flex items-center gap-2 mt-2">
+            <span className="text-[11px] font-bold opacity-80">
+              {completedTodos.length}/{dateTodos.length} 완료
+            </span>
+            <div className="flex-1 h-1.5 bg-black/15 rounded-full overflow-hidden">
+              <motion.div
+                className="h-full rounded-full"
+                style={{ backgroundColor: allDone ? "var(--color-success)" : "#000" }}
+                initial={{ width: 0 }}
+                animate={{ width: `${dateTodos.length === 0 ? 0 : (completedTodos.length / dateTodos.length) * 100}%` }}
+                transition={{ type: "spring", stiffness: 200, damping: 25 }}
+              />
+            </div>
+            {allDone && <Doto mood="celebrate" size={24} />}
+          </div>
         )}
-        <motion.div layoutId={desktopMode ? undefined : `day-${selectedDate}`}>
-          <h1 className="text-[22px] font-black tracking-tight">
-            {dayLabel}
-            <span className="text-[13px] font-bold text-text-secondary ml-2">{weekday}</span>
-          </h1>
-        </motion.div>
       </div>
 
-      {/* Todo card */}
-      <div className="gum-card p-4">
-        {dateTodos.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-12">
-            <Doto mood="sleep" size={72} />
-            <p className="text-text-tertiary text-[14px] mt-3 font-bold">아직 할 일이 없어요</p>
-          </div>
-        ) : (
-          <div>
-            {incompleteTodos.map((todo, i) => (
-              <motion.div key={todo.id} initial={{ opacity: 0, x: -8 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.03, type: "spring", ...springs.reorder }}>
-                <TodoItem todo={todo} date={selectedDate} category={categoryMap.get(todo.categoryId ?? "")} />
-              </motion.div>
-            ))}
-            {completedTodos.length > 0 && (
-              <>
-                <div className="flex items-center gap-2 my-3">
-                  <div className="flex-1 h-[2px] bg-border-subtle" />
-                  <span className="gum-card-pink px-3 py-0.5 text-[10px] font-black">완료 {completedTodos.length}</span>
-                  <div className="flex-1 h-[2px] bg-border-subtle" />
-                </div>
-                {completedTodos.map((todo) => (
-                  <TodoItem key={todo.id} todo={todo} date={selectedDate} category={categoryMap.get(todo.categoryId ?? "")} completed />
-                ))}
-              </>
-            )}
-          </div>
-        )}
+      {/* Content */}
+      <div className="flex-1 overflow-y-auto px-4 pt-4 pb-8">
+        <div className="gum-card p-4">
+          {dateTodos.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-12">
+              <Doto mood="sleep" size={72} />
+              <p className="text-text-tertiary text-[14px] mt-3 font-bold">아직 할 일이 없어요</p>
+            </div>
+          ) : (
+            <div>
+              {incompleteTodos.map((todo, i) => (
+                <motion.div key={todo.id} initial={{ opacity: 0, x: -8 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.03, type: "spring", ...springs.reorder }}>
+                  <TodoItem todo={todo} date={selectedDate} category={categoryMap.get(todo.categoryId ?? "")} />
+                </motion.div>
+              ))}
+              {completedTodos.length > 0 && (
+                <>
+                  <div className="flex items-center gap-2 my-3">
+                    <div className="flex-1 h-[2px] bg-border-subtle" />
+                    <span className="gum-card-pink px-3 py-0.5 text-[10px] font-black">완료 {completedTodos.length}</span>
+                    <div className="flex-1 h-[2px] bg-border-subtle" />
+                  </div>
+                  {completedTodos.map((todo) => (
+                    <TodoItem key={todo.id} todo={todo} date={selectedDate} category={categoryMap.get(todo.categoryId ?? "")} completed />
+                  ))}
+                </>
+              )}
+            </div>
+          )}
 
-        <TodoAdd date={selectedDate} />
+          <TodoAdd date={selectedDate} />
+        </div>
       </div>
     </motion.div>
   );

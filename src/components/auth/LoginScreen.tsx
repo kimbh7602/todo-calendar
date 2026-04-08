@@ -39,17 +39,28 @@ export function LoginScreen() {
   if (!showForm) {
     return (
       <div className="min-h-screen flex flex-col">
-        <nav className="flex items-center justify-between px-6 py-4 border-b-2 border-border-subtle">
-          <span className="text-xl font-extrabold tracking-tight">Living Calendar</span>
+        {/* Nav — pink */}
+        <nav className="gum-header flex items-center justify-between px-6 py-3">
+          <div className="flex items-center gap-2">
+            <Doto mood="wave" size={28} />
+            <span className="text-lg font-black tracking-tight">Living Calendar</span>
+          </div>
           <div className="flex items-center gap-3">
-            <button onClick={() => { setShowForm(true); setMode("login"); }} className="gum-btn px-5 py-2 text-sm">로그인</button>
-            <button onClick={() => { setShowForm(true); setMode("signup"); }} className="gum-btn-pink px-5 py-2 text-sm">시작하기</button>
+            <button onClick={() => { setShowForm(true); setMode("login"); }} className="gum-btn px-5 py-2 text-sm bg-white/60 dark:bg-black/30">로그인</button>
+            <button onClick={() => { setShowForm(true); setMode("signup"); }} className="gum-btn px-5 py-2 text-sm bg-black text-white border-black dark:bg-white dark:text-black dark:border-white">시작하기</button>
           </div>
         </nav>
 
-        <div className="flex-1 flex flex-col items-center justify-center px-6 py-12">
-          <motion.div initial={{ y: 30, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ type: "spring", ...springs.navigate }} className="flex flex-col items-center">
-            <motion.div className="gum-card-pink px-6 py-3 mb-8 text-sm font-bold" initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ delay: 0.1 }}>
+        <div className="flex-1 flex flex-col items-center justify-center px-6 py-12 relative overflow-hidden">
+          {/* Decorative floating shapes */}
+          <motion.div className="absolute top-16 left-[10%] w-12 h-12 rounded-full bg-accent/20 border-2 border-accent/30" style={{ animation: "float 4s ease-in-out infinite" }} />
+          <motion.div className="absolute top-32 right-[12%] w-8 h-8 rounded-sm bg-cat-yellow/30 border-2 border-cat-yellow/40 rotate-12" style={{ animation: "float 5s ease-in-out infinite 0.5s" }} />
+          <motion.div className="absolute bottom-32 left-[15%] w-6 h-6 rounded-full bg-cat-green/25 border-2 border-cat-green/35" style={{ animation: "float 3.5s ease-in-out infinite 1s" }} />
+          <motion.div className="absolute bottom-24 right-[18%] w-10 h-10 rounded-full bg-cat-blue/20 border-2 border-cat-blue/30" style={{ animation: "float 4.5s ease-in-out infinite 0.3s" }} />
+          <motion.div className="absolute top-48 left-[5%] w-4 h-4 rounded-full bg-cat-purple/30" style={{ animation: "float 3s ease-in-out infinite 0.7s" }} />
+
+          <motion.div initial={{ y: 30, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ type: "spring", ...springs.navigate }} className="flex flex-col items-center relative z-10">
+            <motion.div className="gum-card-pink px-6 py-2 mb-6 text-sm font-black" initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ delay: 0.1 }}>
               무료로 시작하세요 ✨
             </motion.div>
 
@@ -64,31 +75,40 @@ export function LoginScreen() {
               </span>
             </h1>
 
-            <p className="text-text-secondary text-lg md:text-xl mt-8 text-center max-w-md leading-relaxed">
-              캘린더에서 날짜를 누르고, 할 일을 적고, 끝내세요. 그게 전부예요.
+            <p className="text-text-secondary text-lg md:text-xl mt-6 text-center max-w-md leading-relaxed">
+              캘린더에서 날짜를 누르고, 할 일을 적고, 끝내세요.
             </p>
 
-            <motion.div className="flex gap-4 mt-10" initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.3 }}>
+            <motion.div className="flex gap-3 mt-8" initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.3 }}>
               <button onClick={() => { setShowForm(true); setMode("signup"); }} className="gum-btn-pink px-10 py-4 text-lg">시작하기 →</button>
             </motion.div>
           </motion.div>
 
-          <motion.div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-16 max-w-2xl w-full" initial={{ y: 40, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.5 }}>
+          {/* Feature cards — compact grid */}
+          <motion.div className="grid grid-cols-1 md:grid-cols-3 gap-3 mt-14 max-w-2xl w-full relative z-10" initial={{ y: 40, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.5 }}>
             {[
-              { emoji: "📅", title: "캘린더 뷰", desc: "한 눈에 보는 할 일" },
-              { emoji: "✅", title: "완료 효과", desc: "끝내면 파티클이 터짐" },
-              { emoji: "🔄", title: "루틴 관리", desc: "반복 할 일 자동 생성" },
+              { emoji: "📅", title: "캘린더 뷰", desc: "한 눈에 보는 할 일", accent: "#FF90E8" },
+              { emoji: "✅", title: "완료 효과", desc: "끝내면 파티클이 터짐", accent: "#23C45E" },
+              { emoji: "🔄", title: "루틴 관리", desc: "반복 할 일 자동 생성", accent: "#4DA6FF" },
             ].map((f, i) => (
-              <motion.div key={f.title} className="gum-card p-5 text-center" initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.6 + i * 0.1 }} whileHover={{ y: -4 }}>
-                <div className="text-3xl mb-2">{f.emoji}</div>
-                <div className="font-bold text-sm">{f.title}</div>
-                <div className="text-text-secondary text-xs mt-1">{f.desc}</div>
+              <motion.div
+                key={f.title}
+                className="gum-card p-4 text-center"
+                initial={{ y: 20, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ delay: 0.6 + i * 0.1 }}
+                whileHover={{ y: -4, borderColor: f.accent }}
+              >
+                <div className="text-2xl mb-1.5">{f.emoji}</div>
+                <div className="font-black text-sm">{f.title}</div>
+                <div className="text-text-secondary text-xs mt-0.5">{f.desc}</div>
               </motion.div>
             ))}
           </motion.div>
 
-          <motion.div className="mt-12" style={{ animation: "float 3s ease-in-out infinite" }} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.8 }}>
-            <Doto mood="wave" size={100} />
+          {/* Doto character */}
+          <motion.div className="mt-10" style={{ animation: "float 3s ease-in-out infinite" }} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.8 }}>
+            <Doto mood="wave" size={80} />
           </motion.div>
         </div>
       </div>
@@ -97,8 +117,11 @@ export function LoginScreen() {
 
   return (
     <div className="min-h-screen flex flex-col">
-      <nav className="flex items-center justify-between px-6 py-4 border-b-2 border-border-subtle">
-        <button onClick={() => setShowForm(false)} className="text-xl font-extrabold tracking-tight hover:text-accent transition-colors">Living Calendar</button>
+      <nav className="gum-header flex items-center justify-between px-6 py-3">
+        <button onClick={() => setShowForm(false)} className="flex items-center gap-2 hover:opacity-70 transition-opacity">
+          <Doto mood="wave" size={28} />
+          <span className="text-lg font-black tracking-tight">Living Calendar</span>
+        </button>
       </nav>
 
       <div className="flex-1 flex items-center justify-center px-6">

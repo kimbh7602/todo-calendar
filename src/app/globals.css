@@ -136,6 +136,85 @@ body {
   color: var(--color-text-tertiary);
 }
 
+/* ===== Header Bar — Pink Energy ===== */
+.gum-header {
+  background: var(--color-accent);
+  border-bottom: 2px solid var(--color-border-subtle);
+  color: #000000;
+}
+
+/* ===== Weekday Row ===== */
+.gum-weekday-row {
+  background: var(--color-bg-secondary);
+}
+
+.gum-weekday-sun {
+  color: #FF4D6A;
+}
+
+.gum-weekday-sat {
+  color: #4DA6FF;
+}
+
+/* ===== Cell with content — subtle fill ===== */
+.gum-cell-has-todos {
+  background: color-mix(in srgb, var(--color-accent) 6%, transparent);
+}
+
+.gum-cell-all-done {
+  background: color-mix(in srgb, var(--color-success) 8%, transparent);
+}
+
+/* ===== Cell Todo Preview ===== */
+.gum-cell-preview {
+  font-size: 9px;
+  line-height: 1.2;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 100%;
+  padding: 0 2px;
+}
+
+.gum-cell-preview-done {
+  text-decoration: line-through;
+  opacity: 0.4;
+}
+
+/* ===== Stats Bar ===== */
+.gum-stats-bar {
+  background: var(--color-bg-secondary);
+  border-top: 2px solid var(--color-border-subtle);
+  padding: 8px 16px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.gum-stat-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 10px;
+  border-radius: var(--radius-full);
+  border: 2px solid var(--color-border-subtle);
+  background: var(--color-bg-primary);
+  font-size: 11px;
+  font-weight: 800;
+}
+
+/* ===== Side Panel Header ===== */
+.gum-panel-header {
+  background: var(--color-accent);
+  border-bottom: 2px solid var(--color-border-subtle);
+  color: #000000;
+  padding: 16px 20px;
+}
+
 /* ===== Animations ===== */
 @keyframes breathe {
   0%, 100% { opacity: 0.4; }
