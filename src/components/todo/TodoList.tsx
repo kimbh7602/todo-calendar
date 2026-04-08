@@ -58,10 +58,10 @@ export function TodoList({ desktopMode = false }: TodoListProps) {
       <div className="gum-panel-header">
         <div className="flex items-center gap-3">
           {!desktopMode && (
-            <button onClick={() => selectDate(null)} className="gum-btn w-8 h-8 text-sm font-bold bg-white/60 dark:bg-black/30">←</button>
+            <button onClick={() => selectDate(null)} className="gum-btn w-8 h-8 text-sm font-bold ">←</button>
           )}
           {desktopMode && (
-            <button onClick={() => selectDate(null)} className="gum-btn w-7 h-7 text-xs font-bold bg-white/60 dark:bg-black/30">✕</button>
+            <button onClick={() => selectDate(null)} className="gum-btn w-7 h-7 text-xs font-bold ">✕</button>
           )}
           <motion.div layoutId={desktopMode ? undefined : `day-${selectedDate}`}>
             <h1 className="text-[22px] font-black tracking-tight">

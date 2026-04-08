@@ -109,10 +109,10 @@ export function CalendarGrid() {
           <h1 className="text-[24px] lg:text-[28px] font-black tracking-tight">{monthLabel}</h1>
         </div>
         <div className="flex gap-2 items-center">
-          <button onClick={prevMonth} className="gum-btn w-9 h-9 text-lg bg-white/60 dark:bg-black/30">‹</button>
-          <button onClick={nextMonth} className="gum-btn w-9 h-9 text-lg bg-white/60 dark:bg-black/30">›</button>
+          <button onClick={prevMonth} className="gum-btn w-9 h-9 text-lg ">‹</button>
+          <button onClick={nextMonth} className="gum-btn w-9 h-9 text-lg ">›</button>
           <ThemeToggle />
-          <button onClick={handleLogout} className="gum-btn w-9 h-9 text-xs bg-white/60 dark:bg-black/30" aria-label="로그아웃">⏻</button>
+          <button onClick={handleLogout} className="gum-btn w-9 h-9 text-xs " aria-label="로그아웃">⏻</button>
         </div>
       </div>
 
@@ -131,25 +131,25 @@ export function CalendarGrid() {
       </div>
 
       {/* Grid — fills remaining space */}
-      <motion.div
-        ref={gridRef}
-        className="flex-1"
-        drag="x"
-        dragConstraints={{ left: 0, right: 0 }}
-        dragElastic={0.2}
-        onDragEnd={handleDragEnd}
-        animate={controls}
-        key={`${currentYear}-${currentMonth}`}
-        initial={{ x: swipeDirection * 100, opacity: 0.5 }}
-        transition={{ type: "spring", ...springs.navigate }}
-      >
-        {Array.from({ length: numWeeks }, (_, weekIdx) => {
-          const weekSegments = multiDaySegments.filter((s) => s.row === weekIdx);
-          const weekDays = cellData.slice(weekIdx * 7, weekIdx * 7 + 7);
+      <div ref={gridRef} className="flex-1 flex flex-col min-h-0 overflow-hidden">
+        <motion.div
+          className="flex-1 flex flex-col min-h-0"
+          drag="x"
+          dragConstraints={{ left: 0, right: 0 }}
+          dragElastic={0.2}
+          onDragEnd={handleDragEnd}
+          animate={controls}
+          key={`${currentYear}-${currentMonth}`}
+          initial={{ x: swipeDirection * 100, opacity: 0.5 }}
+          transition={{ type: "spring", ...springs.navigate }}
+        >
+          {Array.from({ length: numWeeks }, (_, weekIdx) => {
+            const weekSegments = multiDaySegments.filter((s) => s.row === weekIdx);
+            const weekDays = cellData.slice(weekIdx * 7, weekIdx * 7 + 7);
 
-          return (
-            <div key={weekIdx} className="relative">
-              <div className="grid grid-cols-7">
+            return (
+              <div key={weekIdx} className="relative flex-1 min-h-0 overflow-hidden">
+                <div className="grid grid-cols-7 h-full">
                 {weekDays.map((cell, colIdx) => {
                   const isCurrentMonth = cell.date.getMonth() === currentMonth;
                   const today = isToday(cell.date);
@@ -163,7 +163,7 @@ export function CalendarGrid() {
                       layoutId={`day-${cell.dateStr}`}
                       onClick={() => selectDate(cell.dateStr)}
                       className={`
-                        relative flex flex-col items-start pt-1.5 px-1 min-h-[56px] lg:min-h-0 lg:aspect-square
+                        relative flex flex-col items-start pt-1.5 px-1 min-h-[56px] lg:min-h-0 h-full
                         border-r-2 border-b-2 border-border-subtle last:border-r-0 transition-colors text-left
                         ${isCurrentMonth ? "" : "opacity-20"}
                         ${isSelected ? "bg-accent/20 ring-2 ring-inset ring-accent" : ""}
@@ -228,10 +228,11 @@ export function CalendarGrid() {
                   if (!cellDate) return null;
                   return <OverflowIndicator key={key} count={count} row={weekIdx} col={col} cellWidth={cellWidth} onTap={selectDate} date={cellDate} />;
                 })}
-            </div>
-          );
-        })}
-      </motion.div>
+              </div>
+            );
+          })}
+        </motion.div>
+      </div>
 
       {/* Monthly Stats Bar */}
       <div className="gum-stats-bar">
