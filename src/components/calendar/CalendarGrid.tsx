@@ -204,7 +204,7 @@ export function CalendarGrid() {
                           {cell.rate >= 0 && (
                             <CompletionRing
                               rate={cell.rate}
-                              color={cell.dotColors[0] || "var(--color-accent)"}
+                              color={cell.dotColors[0] || "#4F6EF7"}
                             />
                           )}
                         </div>

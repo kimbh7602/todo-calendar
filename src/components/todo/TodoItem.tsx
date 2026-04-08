@@ -27,7 +27,7 @@ export function TodoItem({
   const checkboxRef = useRef<HTMLButtonElement>(null);
   const [scope, animate] = useAnimate();
 
-  const color = category?.color || "var(--color-accent)";
+  const color = category?.color || "#4F6EF7";
 
   const handleToggle = async () => {
     const wasCompleted = isCompleted(todo.id, date);

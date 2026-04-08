@@ -18,17 +18,18 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-    if (selectedDate && !window.matchMedia?.("(min-width: 1024px)")?.matches) {
-      window.history.pushState({ view: "todo", date: selectedDate }, "");
+    const isMobile = !window.matchMedia?.("(min-width: 1024px)")?.matches;
+    if (!isMobile) return;
+
+    if (selectedDate) {
+      window.history.pushState({ view: "todo" }, "");
     }
   }, [selectedDate]);
 
   useEffect(() => {
-    const handlePopState = (e: PopStateEvent) => {
-      // If we had a todo view open, just close it without navigating away
+    const handlePopState = () => {
       const currentDate = useCalendarStore.getState().selectedDate;
       if (currentDate) {
-        e.preventDefault();
         selectDate(null);
       }
     };
