@@ -20,7 +20,6 @@ export default function Home() {
   useEffect(() => {
     const isMobile = !window.matchMedia?.("(min-width: 1024px)")?.matches;
     if (!isMobile) return;
-
     if (selectedDate) {
       window.history.pushState({ view: "todo" }, "");
     }
@@ -29,9 +28,7 @@ export default function Home() {
   useEffect(() => {
     const handlePopState = () => {
       const currentDate = useCalendarStore.getState().selectedDate;
-      if (currentDate) {
-        selectDate(null);
-      }
+      if (currentDate) selectDate(null);
     };
     window.addEventListener("popstate", handlePopState);
     return () => window.removeEventListener("popstate", handlePopState);
@@ -51,7 +48,6 @@ function AppContent() {
 
   useEffect(() => {
     if (initialized) return;
-
     const provider = createSupabaseProvider();
     api.setProvider(provider);
 
@@ -62,7 +58,6 @@ function AppContent() {
           api.fetchTodos(),
           api.fetchCompletions(),
         ]);
-
         useCalendarStore.setState({ categories, todos, completions });
         setInitialized(true);
       } catch (err) {
@@ -70,18 +65,17 @@ function AppContent() {
         setError(err instanceof Error ? err.message : "데이터를 불러오지 못했습니다.");
       }
     }
-
     loadData();
   }, [initialized]);
 
   if (error) {
     return (
-      <main className="max-w-[900px] mx-auto w-full min-h-screen flex items-center justify-center px-4 md:px-8">
-        <div className="glass-card rounded-[var(--radius-lg)] p-6 text-center">
-          <p className="text-error text-sm mb-4">{error}</p>
+      <main className="min-h-screen flex items-center justify-center px-6">
+        <div className="text-center">
+          <p className="text-error text-sm font-medium mb-4">{error}</p>
           <button
             onClick={() => { setError(null); setInitialized(false); }}
-            className="text-accent text-sm font-medium"
+            className="px-6 py-2 rounded-full bg-accent text-black text-sm font-bold"
           >
             다시 시도
           </button>
@@ -92,40 +86,28 @@ function AppContent() {
 
   if (!initialized) {
     return (
-      <main className="max-w-[900px] mx-auto w-full min-h-screen flex items-center justify-center">
-        <div
-          className="w-5 h-5 border-2 border-accent border-t-transparent rounded-full"
-          style={{ animation: "spin 0.8s linear infinite" }}
-        />
+      <main className="min-h-screen flex items-center justify-center">
+        <div className="w-6 h-6 border-[3px] border-accent border-t-transparent rounded-full" style={{ animation: "spin 0.8s linear infinite" }} />
       </main>
     );
   }
 
   return (
-    <main className="max-w-[900px] mx-auto w-full min-h-screen relative px-4 md:px-8">
+    <main className="min-h-screen">
       <LayoutGroup>
-        {/* Desktop: side-by-side */}
-        <div className="hidden lg:flex gap-6 pt-6 pb-8 min-h-screen">
-          <div className="w-[400px] flex-shrink-0">
+        {/* Desktop: fullscreen calendar + side panel */}
+        <div className="hidden lg:flex min-h-screen">
+          <div className="flex-1 min-w-0">
             <CalendarGrid />
           </div>
-          <div className="flex-1 min-w-0">
-            {selectedDate ? (
+          {selectedDate && (
+            <div className="w-[420px] flex-shrink-0 border-l-2 border-border-subtle overflow-y-auto">
               <TodoList desktopMode />
-            ) : (
-              <div className="flex items-center justify-center h-full">
-                <p
-                  className="text-[15px] text-text-tertiary"
-                  style={{ animation: "breathe 3s ease-in-out infinite" }}
-                >
-                  날짜를 선택하세요
-                </p>
-              </div>
-            )}
-          </div>
+            </div>
+          )}
         </div>
 
-        {/* Mobile/Tablet: full screen toggle */}
+        {/* Mobile/Tablet */}
         <div className="lg:hidden">
           <AnimatePresence mode="wait">
             {selectedDate ? (
