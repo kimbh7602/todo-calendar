@@ -40,3 +40,8 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 .gstack/
+.agents/
+.claude/skills/
+.claude/settings.local.json
+skills-lock.json
+supabase/.temp/
