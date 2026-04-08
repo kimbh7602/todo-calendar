@@ -131,8 +131,7 @@ export function CalendarGrid() {
 
       {/* Calendar Card */}
       <div
-        className="bg-bg-secondary rounded-[var(--radius-md)] border border-border-subtle p-3 md:p-4"
-        style={{ boxShadow: "var(--shadow-card)" }}
+        className="glass-card rounded-[var(--radius-lg)] p-3 md:p-4"
       >
         {/* Weekday Labels */}
         <div className="grid grid-cols-7 gap-[1px] mb-1">
@@ -204,7 +203,7 @@ export function CalendarGrid() {
                           {cell.rate >= 0 && (
                             <CompletionRing
                               rate={cell.rate}
-                              color={cell.dotColors[0] || "#4F6EF7"}
+                              color={cell.dotColors[0] || "#5B6EF5"}
                             />
                           )}
                         </div>

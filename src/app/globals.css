@@ -1,52 +1,57 @@
 @import "tailwindcss";
 
-/* ===== Color System ===== */
-/* Define CSS custom properties on :root, then reference in @theme
-   so dark mode .dark overrides work at runtime */
+/* ===== Color System v3: Dark Glassmorphism + Elevated Neutrals ===== */
 
 :root {
-  /* Surfaces */
-  --color-bg-primary: #FAFAF8;
-  --color-bg-secondary: #FFFFFF;
-  --color-bg-elevated: #F5F3EF;
-  --color-border-subtle: #E8E5DF;
+  /* Surfaces — Elevated Neutrals (warm sand, not harsh white) */
+  --color-bg-primary: #EDE8E1;
+  --color-bg-secondary: rgba(255, 255, 255, 0.65);
+  --color-bg-elevated: #E5E0D8;
+  --color-border-subtle: rgba(0, 0, 0, 0.08);
 
-  /* Text */
+  /* Text — slightly stronger contrast */
   --color-text-primary: #1A1A1A;
-  --color-text-secondary: #6B6B6B;
-  --color-text-tertiary: #A3A3A3;
+  --color-text-secondary: #5C5C5C;
+  --color-text-tertiary: #8C8C8C;
 
   /* Semantic */
-  --color-accent: #4F6EF7;
+  --color-accent: #5B6EF5;
   --color-success: #7CB342;
   --color-warning: #F5A623;
   --color-error: #FF6B6B;
 
   /* Shadows */
-  --shadow-card: 0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.02);
-  --shadow-card-hover: 0 4px 12px rgba(0,0,0,0.06), 0 2px 4px rgba(0,0,0,0.03);
+  --shadow-card: 0 4px 24px rgba(0, 0, 0, 0.06);
+  --shadow-card-hover: 0 8px 32px rgba(0, 0, 0, 0.10);
+
+  /* Glass */
+  --glass-blur: blur(12px);
+  --glass-border: 1px solid rgba(0, 0, 0, 0.06);
 }
 
+/* ===== Dark Mode — Dark Glassmorphism ===== */
 .dark {
-  --color-bg-primary: #1C1C1E;
-  --color-bg-secondary: #2C2C2E;
-  --color-bg-elevated: #3A3A3C;
-  --color-border-subtle: #48484A;
+  --color-bg-primary: #0C0C10;
+  --color-bg-secondary: rgba(255, 255, 255, 0.06);
+  --color-bg-elevated: rgba(255, 255, 255, 0.10);
+  --color-border-subtle: rgba(255, 255, 255, 0.10);
 
-  --color-text-primary: #F5F5F5;
-  --color-text-secondary: #A1A1A6;
-  --color-text-tertiary: #636366;
+  --color-text-primary: #F0F0F2;
+  --color-text-secondary: #9A9AA8;
+  --color-text-tertiary: #5A5A68;
 
-  --color-accent: #6B8AFF;
+  --color-accent: #7B8FFF;
   --color-success: #8BC34A;
   --color-warning: #FFD54F;
   --color-error: #FF8A80;
 
-  --shadow-card: 0 1px 3px rgba(0,0,0,0.2), 0 1px 2px rgba(0,0,0,0.12);
-  --shadow-card-hover: 0 4px 12px rgba(0,0,0,0.3), 0 2px 4px rgba(0,0,0,0.15);
+  --shadow-card: 0 8px 32px rgba(0, 0, 0, 0.3);
+  --shadow-card-hover: 0 12px 48px rgba(0, 0, 0, 0.4);
+
+  --glass-border: 1px solid rgba(255, 255, 255, 0.10);
 }
 
-/* Tell Tailwind to use var() references for dynamic tokens */
+/* Tailwind theme — var() references for runtime dark mode */
 @theme {
   --color-bg-primary: var(--color-bg-primary);
   --color-bg-secondary: var(--color-bg-secondary);
@@ -66,9 +71,8 @@
   --shadow-card-hover: var(--shadow-card-hover);
 }
 
-/* Static tokens: inline is fine, these don't change between themes */
+/* Static tokens */
 @theme inline {
-  /* Categories */
   --color-cat-coral: #FF6B6B;
   --color-cat-amber: #F5A623;
   --color-cat-sage: #7CB342;
@@ -77,13 +81,11 @@
   --color-cat-rose: #FF7EB3;
   --color-cat-teal: #26A69A;
 
-  /* Radius */
   --radius-sm: 6px;
   --radius-md: 12px;
   --radius-lg: 16px;
   --radius-full: 9999px;
 
-  /* Font */
   --font-sans: "Pretendard Variable", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
   --font-mono: "Geist Mono", monospace;
 }
@@ -92,6 +94,24 @@ body {
   background: var(--color-bg-primary);
   color: var(--color-text-primary);
   font-family: var(--font-sans);
+}
+
+/* Dark mode ambient gradient background */
+.dark body {
+  background:
+    radial-gradient(ellipse at 20% 50%, rgba(91, 110, 245, 0.08), transparent 60%),
+    radial-gradient(ellipse at 80% 20%, rgba(171, 123, 255, 0.06), transparent 50%),
+    var(--color-bg-primary);
+  background-attachment: fixed;
+}
+
+/* Glassmorphism card utility */
+.glass-card {
+  background: var(--color-bg-secondary);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: var(--glass-border);
+  box-shadow: var(--shadow-card);
 }
 
 /* ===== Animations ===== */
@@ -105,6 +125,6 @@ body {
 }
 
 @keyframes today-pulse {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(79, 110, 247, 0.3); }
-  50% { box-shadow: 0 0 0 4px rgba(79, 110, 247, 0); }
+  0%, 100% { box-shadow: 0 0 0 0 rgba(91, 110, 245, 0.3); }
+  50% { box-shadow: 0 0 0 4px rgba(91, 110, 245, 0); }
 }

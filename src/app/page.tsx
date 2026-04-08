@@ -77,7 +77,7 @@ function AppContent() {
   if (error) {
     return (
       <main className="max-w-[900px] mx-auto w-full min-h-screen flex items-center justify-center px-4 md:px-8">
-        <div className="bg-bg-secondary rounded-[var(--radius-md)] p-6 text-center" style={{ boxShadow: "var(--shadow-card)" }}>
+        <div className="glass-card rounded-[var(--radius-lg)] p-6 text-center">
           <p className="text-error text-sm mb-4">{error}</p>
           <button
             onClick={() => { setError(null); setInitialized(false); }}
