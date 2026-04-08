@@ -85,19 +85,12 @@ function AppContent() {
           <AnimatePresence>
             {selectedDate && (
               <motion.div
-                className="w-[420px] flex-shrink-0 border-l-2 border-border-subtle overflow-y-auto relative"
+                className="w-[420px] flex-shrink-0 border-l-2 border-border-subtle overflow-hidden"
                 initial={{ width: 0, opacity: 0 }}
                 animate={{ width: 420, opacity: 1 }}
                 exit={{ width: 0, opacity: 0 }}
                 transition={{ type: "spring", stiffness: 300, damping: 30 }}
               >
-                {/* Close button */}
-                <button
-                  onClick={() => selectDate(null)}
-                  className="absolute top-4 right-4 z-10 w-8 h-8 gum-btn text-sm flex items-center justify-center"
-                >
-                  ✕
-                </button>
                 <TodoList desktopMode />
               </motion.div>
             )}

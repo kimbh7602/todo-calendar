@@ -9,17 +9,25 @@ vi.mock("framer-motion", async () => {
     ...actual,
     AnimatePresence: ({ children }: { children: React.ReactNode }) => children,
     LayoutGroup: ({ children }: { children: React.ReactNode }) => children,
-    motion: {
-      div: ({ children, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
-        <div {...props}>{children}</div>
-      ),
-      button: ({
-        children,
-        ...props
-      }: React.ButtonHTMLAttributes<HTMLButtonElement>) => (
-        <button {...props}>{children}</button>
-      ),
-    },
+    motion: new Proxy(
+      {},
+      {
+        get: (_target, prop: string) => {
+          const El = prop as keyof JSX.IntrinsicElements;
+          const Component = ({ children, ...props }: Record<string, unknown>) => {
+            const filtered = Object.fromEntries(
+              Object.entries(props).filter(
+                ([k]) => !["initial", "animate", "exit", "transition", "whileTap", "whileHover", "layoutId", "drag", "dragConstraints", "dragElastic", "onDragEnd", "variants", "style"].includes(k)
+              )
+            );
+            return <El {...(filtered as React.HTMLAttributes<HTMLElement>)}>{children as React.ReactNode}</El>;
+          };
+          return Component;
+        },
+      }
+    ),
+    useAnimation: () => ({ start: vi.fn() }),
+    useAnimate: () => [{ current: null }, vi.fn()],
   };
 });
 
