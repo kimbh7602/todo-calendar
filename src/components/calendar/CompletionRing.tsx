@@ -6,7 +6,7 @@ interface CompletionRingProps {
   size?: number;
 }
 
-export function CompletionRing({ rate, color, size = 32 }: CompletionRingProps) {
+export function CompletionRing({ rate, color, size = 28 }: CompletionRingProps) {
   if (rate <= 0) return null;
 
   const strokeWidth = 2;
@@ -18,9 +18,21 @@ export function CompletionRing({ rate, color, size = 32 }: CompletionRingProps) 
     <svg
       width={size}
       height={size}
-      className="absolute"
-      style={{ opacity: 0.5 }}
+      viewBox={`0 0 ${size} ${size}`}
+      className="absolute inset-0 m-auto pointer-events-none"
+      style={{ opacity: 0.6 }}
     >
+      {/* Background track */}
+      <circle
+        cx={size / 2}
+        cy={size / 2}
+        r={radius}
+        fill="none"
+        stroke={color}
+        strokeWidth={strokeWidth}
+        opacity={0.15}
+      />
+      {/* Progress arc */}
       <circle
         cx={size / 2}
         cy={size / 2}
