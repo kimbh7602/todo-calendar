@@ -1,15 +1,15 @@
 @import "tailwindcss";
 
-/* ===== v4: Bold Minimal Kitsch (Gumroad-Inspired) ===== */
+/* ===== v5: Gumroad Bold — Thick Borders + Pink Energy ===== */
 
 :root {
   --color-bg-primary: #FFFFFF;
   --color-bg-secondary: #F4F4F0;
   --color-bg-elevated: #E8E8E4;
-  --color-border-subtle: #E0E0DC;
+  --color-border-subtle: #000000;
 
   --color-text-primary: #000000;
-  --color-text-secondary: #666666;
+  --color-text-secondary: #555555;
   --color-text-tertiary: #999999;
 
   --color-accent: #FF90E8;
@@ -21,12 +21,12 @@
 
 .dark {
   --color-bg-primary: #000000;
-  --color-bg-secondary: #1A1A1A;
-  --color-bg-elevated: #2A2A2A;
-  --color-border-subtle: #333333;
+  --color-bg-secondary: #141414;
+  --color-bg-elevated: #222222;
+  --color-border-subtle: #FFFFFF;
 
   --color-text-primary: #FFFFFF;
-  --color-text-secondary: #999999;
+  --color-text-secondary: #AAAAAA;
   --color-text-tertiary: #666666;
 
   --color-accent: #FF90E8;
@@ -41,11 +41,9 @@
   --color-bg-secondary: var(--color-bg-secondary);
   --color-bg-elevated: var(--color-bg-elevated);
   --color-border-subtle: var(--color-border-subtle);
-
   --color-text-primary: var(--color-text-primary);
   --color-text-secondary: var(--color-text-secondary);
   --color-text-tertiary: var(--color-text-tertiary);
-
   --color-accent: var(--color-accent);
   --color-accent-hover: var(--color-accent-hover);
   --color-success: var(--color-success);
@@ -77,9 +75,71 @@ body {
   font-family: var(--font-sans);
 }
 
+/* ===== Gumroad-style Card ===== */
+.gum-card {
+  background: var(--color-bg-primary);
+  border: 2px solid var(--color-border-subtle);
+  border-radius: var(--radius-md);
+}
+
+.gum-card-pink {
+  background: var(--color-accent);
+  border: 2px solid var(--color-border-subtle);
+  border-radius: var(--radius-md);
+  color: #000000;
+}
+
+.gum-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  border: 2px solid var(--color-border-subtle);
+  border-radius: var(--radius-full);
+  transition: all 0.15s ease;
+}
+
+.gum-btn:hover {
+  background: var(--color-accent);
+  color: #000000;
+}
+
+.gum-btn-pink {
+  background: var(--color-accent);
+  color: #000000;
+  font-weight: 700;
+  border: 2px solid var(--color-border-subtle);
+  border-radius: var(--radius-full);
+  transition: all 0.15s ease;
+}
+
+.gum-btn-pink:hover {
+  background: var(--color-accent-hover);
+}
+
+.gum-input {
+  width: 100%;
+  background: var(--color-bg-primary);
+  border: 2px solid var(--color-border-subtle);
+  border-radius: var(--radius-md);
+  padding: 12px 16px;
+  font-size: 15px;
+  outline: none;
+  transition: border-color 0.15s ease;
+}
+
+.gum-input:focus {
+  border-color: var(--color-accent);
+}
+
+.gum-input::placeholder {
+  color: var(--color-text-tertiary);
+}
+
+/* ===== Animations ===== */
 @keyframes breathe {
-  0%, 100% { opacity: 0.3; }
-  50% { opacity: 0.6; }
+  0%, 100% { opacity: 0.4; }
+  50% { opacity: 0.7; }
 }
 
 @keyframes spin {
@@ -87,17 +147,22 @@ body {
 }
 
 @keyframes today-pulse {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(255, 144, 232, 0.4); }
+  0%, 100% { box-shadow: 0 0 0 0 rgba(255, 144, 232, 0.5); }
   50% { box-shadow: 0 0 0 6px rgba(255, 144, 232, 0); }
 }
 
 @keyframes float {
   0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-8px); }
+  50% { transform: translateY(-10px); }
 }
 
 @keyframes wave {
   0%, 100% { transform: rotate(0deg); }
   25% { transform: rotate(14deg); }
   75% { transform: rotate(-14deg); }
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
 }

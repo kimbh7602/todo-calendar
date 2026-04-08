@@ -8,12 +8,7 @@ import { spawnParticles, spawnConfetti } from "@/lib/particles";
 import { playCompletionSound } from "@/lib/sound";
 import { springs } from "@/lib/springs";
 
-interface TodoItemProps {
-  todo: Todo;
-  date: string;
-  category?: Category;
-  completed?: boolean;
-}
+interface TodoItemProps { todo: Todo; date: string; category?: Category; completed?: boolean; }
 
 export function TodoItem({ todo, date, category, completed = false }: TodoItemProps) {
   const toggleCompletion = useCalendarStore((s) => s.toggleCompletion);
@@ -27,13 +22,11 @@ export function TodoItem({ todo, date, category, completed = false }: TodoItemPr
   const handleToggle = async () => {
     const wasCompleted = isCompleted(todo.id, date);
     await toggleCompletion(todo.id, date);
-
     if (!wasCompleted && checkboxRef.current) {
       playCompletionSound();
       await animate(checkboxRef.current, { scale: [1, 1.3, 1] }, { duration: 0.25, type: "spring", ...springs.check });
       const rect = checkboxRef.current.getBoundingClientRect();
       spawnParticles(rect.left + rect.width / 2, rect.top + rect.height / 2, color);
-
       const allTodos = getTodosForDate(date);
       const allDone = allTodos.every((t) => t.id === todo.id ? true : isCompleted(t.id, date));
       if (allDone && allTodos.length > 1) setTimeout(spawnConfetti, 300);
@@ -41,15 +34,15 @@ export function TodoItem({ todo, date, category, completed = false }: TodoItemPr
   };
 
   return (
-    <div ref={scope} className={`flex items-center gap-3 py-3 ${completed ? "opacity-40" : ""}`}>
+    <div ref={scope} className={`flex items-center gap-3 py-3 ${completed ? "opacity-35" : ""}`}>
       <motion.button
         ref={checkboxRef}
         onClick={handleToggle}
-        className="w-6 h-6 rounded-[var(--radius-sm)] border-[2.5px] flex items-center justify-center flex-shrink-0 transition-colors"
+        className="w-6 h-6 rounded-[var(--radius-sm)] border-[2.5px] flex items-center justify-center flex-shrink-0"
         style={{ borderColor: color, backgroundColor: completed ? color : "transparent" }}
         whileTap={{ scale: 0.85 }}
       >
-        {completed && <span className="text-white text-[14px] font-bold">✓</span>}
+        {completed && <span className="text-black text-[14px] font-black">✓</span>}
       </motion.button>
 
       <span className={`flex-1 text-[15px] font-medium ${completed ? "text-text-tertiary line-through" : "text-text-primary"}`}>
@@ -57,10 +50,7 @@ export function TodoItem({ todo, date, category, completed = false }: TodoItemPr
       </span>
 
       {category && (
-        <span
-          className="text-[11px] font-bold px-2.5 py-1 rounded-full"
-          style={{ backgroundColor: `${color}20`, color }}
-        >
+        <span className="text-[10px] font-black px-2.5 py-1 rounded-full border-2" style={{ borderColor: color, color, backgroundColor: `${color}15` }}>
           {category.name}
         </span>
       )}

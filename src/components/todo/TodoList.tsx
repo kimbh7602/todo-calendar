@@ -9,9 +9,7 @@ import { parseDate, getWeekdayLabel } from "@/lib/date";
 import { springs } from "@/lib/springs";
 import { Doto } from "@/components/Doto";
 
-interface TodoListProps {
-  desktopMode?: boolean;
-}
+interface TodoListProps { desktopMode?: boolean; }
 
 export function TodoList({ desktopMode = false }: TodoListProps) {
   const selectedDate = useCalendarStore((s) => s.selectedDate);
@@ -40,7 +38,6 @@ export function TodoList({ desktopMode = false }: TodoListProps) {
     () => new Set(completions.filter((c) => c.completedDate === selectedDate).map((c) => c.todoId)),
     [completions, selectedDate]
   );
-
   const categoryMap = useMemo(() => new Map(categories.map((c) => [c.id, c])), [categories]);
 
   if (!selectedDate) return null;
@@ -53,51 +50,53 @@ export function TodoList({ desktopMode = false }: TodoListProps) {
 
   return (
     <motion.div
-      className={desktopMode ? "p-6 h-full" : "px-4 pt-6 pb-8 min-h-screen"}
-      initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }}
+      className={desktopMode ? "p-5 pt-14 h-full" : "px-4 pt-4 pb-8 min-h-screen"}
+      initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.15 }}
     >
-      <div className="flex items-center gap-3 mb-6">
+      {/* Header */}
+      <div className="flex items-center gap-3 mb-5">
         {!desktopMode && (
-          <motion.button onClick={() => selectDate(null)} className="w-9 h-9 rounded-full border-2 border-border-subtle bg-bg-primary flex items-center justify-center text-text-primary font-bold" whileTap={{ scale: 0.85 }}>
-            ←
-          </motion.button>
+          <button onClick={() => selectDate(null)} className="gum-btn w-9 h-9 text-sm font-bold">←</button>
         )}
         <motion.div layoutId={desktopMode ? undefined : `day-${selectedDate}`}>
-          <h1 className="text-[22px] font-extrabold tracking-tight">
+          <h1 className="text-[22px] font-black tracking-tight">
             {dayLabel}
-            <span className="text-[14px] font-medium text-text-secondary ml-2">{weekday}</span>
+            <span className="text-[13px] font-bold text-text-secondary ml-2">{weekday}</span>
           </h1>
         </motion.div>
       </div>
 
-      {dateTodos.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-16">
-          <Doto mood="sleep" size={80} />
-          <p className="text-text-tertiary text-[15px] mt-4 font-medium">아직 할 일이 없어요</p>
-        </div>
-      ) : (
-        <div>
-          {incompleteTodos.map((todo, i) => (
-            <motion.div key={todo.id} initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.04, type: "spring", ...springs.reorder }}>
-              <TodoItem todo={todo} date={selectedDate} category={categoryMap.get(todo.categoryId ?? "")} />
-            </motion.div>
-          ))}
-          {completedTodos.length > 0 && (
-            <>
-              <div className="flex items-center gap-2 my-3">
-                <div className="flex-1 h-px bg-border-subtle" />
-                <span className="text-text-tertiary text-[11px] font-semibold">완료 {completedTodos.length}</span>
-                <div className="flex-1 h-px bg-border-subtle" />
-              </div>
-              {completedTodos.map((todo) => (
-                <TodoItem key={todo.id} todo={todo} date={selectedDate} category={categoryMap.get(todo.categoryId ?? "")} completed />
-              ))}
-            </>
-          )}
-        </div>
-      )}
+      {/* Todo card */}
+      <div className="gum-card p-4">
+        {dateTodos.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-12">
+            <Doto mood="sleep" size={72} />
+            <p className="text-text-tertiary text-[14px] mt-3 font-bold">아직 할 일이 없어요</p>
+          </div>
+        ) : (
+          <div>
+            {incompleteTodos.map((todo, i) => (
+              <motion.div key={todo.id} initial={{ opacity: 0, x: -8 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.03, type: "spring", ...springs.reorder }}>
+                <TodoItem todo={todo} date={selectedDate} category={categoryMap.get(todo.categoryId ?? "")} />
+              </motion.div>
+            ))}
+            {completedTodos.length > 0 && (
+              <>
+                <div className="flex items-center gap-2 my-3">
+                  <div className="flex-1 h-[2px] bg-border-subtle" />
+                  <span className="gum-card-pink px-3 py-0.5 text-[10px] font-black">완료 {completedTodos.length}</span>
+                  <div className="flex-1 h-[2px] bg-border-subtle" />
+                </div>
+                {completedTodos.map((todo) => (
+                  <TodoItem key={todo.id} todo={todo} date={selectedDate} category={categoryMap.get(todo.categoryId ?? "")} completed />
+                ))}
+              </>
+            )}
+          </div>
+        )}
 
-      <TodoAdd date={selectedDate} />
+        <TodoAdd date={selectedDate} />
+      </div>
     </motion.div>
   );
 }
