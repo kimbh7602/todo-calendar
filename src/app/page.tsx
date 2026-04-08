@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { AnimatePresence, LayoutGroup, motion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import { useCalendarStore } from "@/stores/calendarStore";
 import { CalendarGrid } from "@/components/calendar/CalendarGrid";
 import { TodoList } from "@/components/todo/TodoList";
@@ -34,7 +34,6 @@ export default function Home() {
 
 function AppContent() {
   const selectedDate = useCalendarStore((s) => s.selectedDate);
-  const selectDate = useCalendarStore((s) => s.selectDate);
   const [initialized, setInitialized] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -57,10 +56,10 @@ function AppContent() {
 
   if (error) {
     return (
-      <main className="min-h-screen flex items-center justify-center px-6">
-        <div className="gum-card p-8 text-center max-w-sm">
-          <p className="text-error text-sm font-bold mb-4">{error}</p>
-          <button onClick={() => { setError(null); setInitialized(false); }} className="gum-btn-pink px-6 py-2 text-sm">다시 시도</button>
+      <main className="min-h-screen flex items-center justify-center px-6 bg-bg-secondary">
+        <div className="bg-bg-elevated border border-border rounded-xl p-8 text-center max-w-sm">
+          <p className="text-error text-[14px] mb-4">{error}</p>
+          <button onClick={() => { setError(null); setInitialized(false); }} className="px-6 py-2 bg-accent text-white text-[13px] font-medium rounded-lg hover:bg-accent-hover transition-colors">다시 시도</button>
         </div>
       </main>
     );
@@ -68,42 +67,46 @@ function AppContent() {
 
   if (!initialized) {
     return (
-      <main className="min-h-screen flex items-center justify-center">
-        <div className="w-6 h-6 border-[3px] border-accent border-t-transparent rounded-full" style={{ animation: "spin 0.8s linear infinite" }} />
+      <main className="min-h-screen flex items-center justify-center bg-bg-secondary">
+        <div className="w-5 h-5 border-2 border-accent border-t-transparent rounded-full" style={{ animation: "spin 0.8s linear infinite" }} />
       </main>
     );
   }
 
   return (
-    <main className="min-h-screen">
-      <LayoutGroup>
-        {/* Desktop: fullscreen calendar + closable side panel */}
-        <div className="hidden lg:flex min-h-screen">
-          <div className="flex-1 min-w-0">
-            <CalendarGrid />
-          </div>
-          <AnimatePresence>
-            {selectedDate && (
-              <motion.div
-                className="w-[420px] flex-shrink-0 border-l-2 border-border-subtle overflow-hidden"
-                initial={{ width: 0, opacity: 0 }}
-                animate={{ width: 420, opacity: 1 }}
-                exit={{ width: 0, opacity: 0 }}
-                transition={{ type: "spring", stiffness: 300, damping: 30 }}
-              >
-                <TodoList desktopMode />
-              </motion.div>
-            )}
-          </AnimatePresence>
+    <main className="min-h-screen bg-bg-secondary">
+      {/* Desktop */}
+      <div className="hidden lg:flex min-h-screen p-3 gap-3">
+        <div className="flex-1 min-w-0">
+          <CalendarGrid />
         </div>
+        <AnimatePresence>
+          {selectedDate && (
+            <motion.div
+              className="w-[380px] flex-shrink-0 bg-bg-elevated border border-border rounded-xl overflow-hidden"
+              initial={{ width: 0, opacity: 0 }}
+              animate={{ width: 380, opacity: 1 }}
+              exit={{ width: 0, opacity: 0 }}
+              transition={{ type: "spring", stiffness: 300, damping: 30 }}
+            >
+              <TodoList desktopMode />
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
 
-        {/* Mobile/Tablet */}
-        <div className="lg:hidden">
-          <AnimatePresence mode="wait">
-            {selectedDate ? <TodoList key="todo" /> : <CalendarGrid key="calendar" />}
-          </AnimatePresence>
-        </div>
-      </LayoutGroup>
+      {/* Mobile/Tablet */}
+      <div className="lg:hidden">
+        <AnimatePresence mode="wait">
+          {selectedDate ? (
+            <TodoList key="todo" />
+          ) : (
+            <div key="calendar" className="p-3 min-h-screen">
+              <CalendarGrid />
+            </div>
+          )}
+        </AnimatePresence>
+      </div>
     </main>
   );
 }
