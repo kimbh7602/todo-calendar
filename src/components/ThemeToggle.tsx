@@ -24,11 +24,12 @@ export function ThemeToggle() {
   return (
     <motion.button
       onClick={toggle}
-      className="w-8 h-8 rounded-full bg-bg-elevated flex items-center justify-center text-text-secondary text-sm"
-      whileTap={{ scale: 0.9 }}
+      className="w-9 h-9 rounded-full border-2 border-border-subtle bg-bg-primary flex items-center justify-center text-lg"
+      whileTap={{ scale: 0.85 }}
+      whileHover={{ scale: 1.05 }}
       aria-label={dark ? "라이트 모드로 전환" : "다크 모드로 전환"}
     >
-      {dark ? "☀" : "☾"}
+      {dark ? "☀️" : "🌙"}
     </motion.button>
   );
 }

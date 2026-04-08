@@ -7,6 +7,7 @@ import { TodoItem } from "./TodoItem";
 import { TodoAdd } from "./TodoAdd";
 import { parseDate, getWeekdayLabel } from "@/lib/date";
 import { springs } from "@/lib/springs";
+import { Doto } from "@/components/Doto";
 
 interface TodoListProps {
   desktopMode?: boolean;
@@ -30,9 +31,7 @@ export function TodoList({ desktopMode = false }: TodoListProps) {
         if (todo.routineEndDate && selectedDate > todo.routineEndDate) return false;
         return true;
       }
-      if (todo.endDate) {
-        return selectedDate >= todo.startDate && selectedDate <= todo.endDate;
-      }
+      if (todo.endDate) return selectedDate >= todo.startDate && selectedDate <= todo.endDate;
       return selectedDate === todo.startDate;
     });
   }, [todos, selectedDate]);
@@ -42,100 +41,63 @@ export function TodoList({ desktopMode = false }: TodoListProps) {
     [completions, selectedDate]
   );
 
-  const categoryMap = useMemo(
-    () => new Map(categories.map((c) => [c.id, c])),
-    [categories]
-  );
+  const categoryMap = useMemo(() => new Map(categories.map((c) => [c.id, c])), [categories]);
 
   if (!selectedDate) return null;
 
   const date = parseDate(selectedDate);
   const dayLabel = `${date.getMonth() + 1}월 ${date.getDate()}일`;
   const weekday = getWeekdayLabel(date.getDay()) + "요일";
-
   const incompleteTodos = dateTodos.filter((t) => !completionSet.has(t.id));
   const completedTodos = dateTodos.filter((t) => completionSet.has(t.id));
 
   return (
     <motion.div
-      className={desktopMode ? "pb-8" : "px-4 pt-8 pb-8 min-h-screen"}
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      transition={{ duration: 0.2 }}
+      className={desktopMode ? "p-6 h-full" : "px-4 pt-6 pb-8 min-h-screen"}
+      initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }}
     >
       <div className="flex items-center gap-3 mb-6">
         {!desktopMode && (
-          <motion.button
-            onClick={() => selectDate(null)}
-            className="w-9 h-9 rounded-full bg-bg-elevated flex items-center justify-center text-text-secondary border border-border-subtle"
-            whileTap={{ scale: 0.9 }}
-          >
+          <motion.button onClick={() => selectDate(null)} className="w-9 h-9 rounded-full border-2 border-border-subtle bg-bg-primary flex items-center justify-center text-text-primary font-bold" whileTap={{ scale: 0.85 }}>
             ←
           </motion.button>
         )}
         <motion.div layoutId={desktopMode ? undefined : `day-${selectedDate}`}>
-          <h1 className="text-[18px] font-semibold tracking-tight text-text-primary">
+          <h1 className="text-[22px] font-extrabold tracking-tight">
             {dayLabel}
-            <span className="text-sm font-normal text-text-secondary ml-1.5">
-              {weekday}
-            </span>
+            <span className="text-[14px] font-medium text-text-secondary ml-2">{weekday}</span>
           </h1>
         </motion.div>
       </div>
 
-      <div
-        className="glass-card rounded-[var(--radius-lg)] p-4"
-      >
-        {dateTodos.length === 0 ? (
-          <div className="flex items-center justify-center py-16">
-            <p
-              className="text-[15px] text-text-tertiary"
-              style={{ animation: "breathe 3s ease-in-out infinite" }}
-            >
-              nothing here yet
-            </p>
-          </div>
-        ) : (
-          <div>
-            {incompleteTodos.map((todo, i) => (
-              <motion.div
-                key={todo.id}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{
-                  delay: i * 0.05,
-                  type: "spring",
-                  ...springs.reorder,
-                }}
-              >
-                <TodoItem
-                  todo={todo}
-                  date={selectedDate}
-                  category={categoryMap.get(todo.categoryId ?? "")}
-                />
-              </motion.div>
-            ))}
+      {dateTodos.length === 0 ? (
+        <div className="flex flex-col items-center justify-center py-16">
+          <Doto mood="sleep" size={80} />
+          <p className="text-text-tertiary text-[15px] mt-4 font-medium">아직 할 일이 없어요</p>
+        </div>
+      ) : (
+        <div>
+          {incompleteTodos.map((todo, i) => (
+            <motion.div key={todo.id} initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.04, type: "spring", ...springs.reorder }}>
+              <TodoItem todo={todo} date={selectedDate} category={categoryMap.get(todo.categoryId ?? "")} />
+            </motion.div>
+          ))}
+          {completedTodos.length > 0 && (
+            <>
+              <div className="flex items-center gap-2 my-3">
+                <div className="flex-1 h-px bg-border-subtle" />
+                <span className="text-text-tertiary text-[11px] font-semibold">완료 {completedTodos.length}</span>
+                <div className="flex-1 h-px bg-border-subtle" />
+              </div>
+              {completedTodos.map((todo) => (
+                <TodoItem key={todo.id} todo={todo} date={selectedDate} category={categoryMap.get(todo.categoryId ?? "")} completed />
+              ))}
+            </>
+          )}
+        </div>
+      )}
 
-            {completedTodos.length > 0 && (
-              <>
-                <div className="h-px bg-border-subtle my-2" />
-                {completedTodos.map((todo) => (
-                  <TodoItem
-                    key={todo.id}
-                    todo={todo}
-                    date={selectedDate}
-                    category={categoryMap.get(todo.categoryId ?? "")}
-                    completed
-                  />
-                ))}
-              </>
-            )}
-          </div>
-        )}
-
-        <TodoAdd date={selectedDate} />
-      </div>
+      <TodoAdd date={selectedDate} />
     </motion.div>
   );
 }
